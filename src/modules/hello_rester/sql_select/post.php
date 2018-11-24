@@ -1,6 +1,7 @@
 <?php if(!defined('__RESTER__')) exit;
 
-$query = " SELECT * FROM example ";
+$rows = rester::cfg('rows');
+$query = " SELECT * FROM example LIMIT {$rows} ";
 
 $pdo = db::get();
 
