@@ -1,6 +1,4 @@
 <?php
-include_once('./rester/common.php');
-
 $response_body = array(
     'success'=>false,
     'msg'=>'',
@@ -9,6 +7,7 @@ $response_body = array(
 
 try
 {
+    include_once('./rester/common.php');
     $response_body['data'] = rester::run();
     $response_body['msg'] = implode(',', rester::msg());
     if(rester::isSuccess()) $response_body['success'] = true;

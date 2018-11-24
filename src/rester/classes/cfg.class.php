@@ -112,10 +112,25 @@ class cfg
         else throw new Exception("Invalid request METHOD.(Allowed POST,GET)");
 
         // Check allows ip address
+        //check ip from share internet
+        if (!empty($_SERVER['HTTP_CLIENT_IP']))
+        {
+            $access_ip=$_SERVER['HTTP_CLIENT_IP'];
+        }
+        //to check ip is pass from proxy
+        else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+        {
+            $access_ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+        else
+        {
+            $access_ip=$_SERVER['REMOTE_ADDR'];
+        }
+
         if($cfg['access_control']['allows_origin']!='*')
         {
             if(!is_array($cfg['access_control']['allows_origin'])) $cfg['access_control']['allows_origin'] = array($cfg['access_control']['allows_origin']);
-            if(!in_array(GetRealIPAddr(),$cfg['access_control']['allows_origin'])) throw new Exception("Access denied.(Not allowed ip address)");
+            if(!in_array($access_ip,$cfg['access_control']['allows_origin'])) throw new Exception("Access denied.(Not allowed ip address:{$access_ip})");
         }
 
         // Extract request parameter
@@ -147,20 +162,14 @@ class cfg
      * @param string $key
      *
      * @return array|string
+     * @throws Exception
      */
     public static function Get($section='', $key='')
     {
         if(!isset(self::$data))
         {
-            try
-            {
-                self::init();
-            }
-            catch (Exception $e)
-            {
-                echo $e->getMessage();
-                exit;
-            }
+            try { self::init(); }
+            catch (Exception $e) { throw $e; }
         }
         if($section==='') return self::$data;
         if($section && $key) return self::$data[$section][$key];

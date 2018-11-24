@@ -19,6 +19,7 @@ class rester
     protected static $success = true;
     protected static $msg = array();
 
+    protected static $cfg;
     protected static $check_auth = false;
     protected static $use_cache = false;
     protected static $cache_timeout;
@@ -87,7 +88,7 @@ class rester
         if(self::$check_auth) { session::get(cfg::token()); }
 
         ///=====================================================================
-        /// check auth,cache
+        /// check cache
         ///=====================================================================
         $redis_cfg = cfg::cache();
         if(self::$use_cache && !($redis_cfg['host'] && $redis_cfg['port'])) throw new Exception("Require cache config to use cache.");
@@ -103,7 +104,19 @@ class rester
             $response_data = json_decode($redis->get($cache_key),true);
         }
 
-        // include procedure
+        ///=====================================================================
+        /// include config.ini
+        ///=====================================================================
+        $cfg = array();
+        if($path = self::path_cfg())
+        {
+            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
+        }
+        self::$cfg = $cfg;
+
+        ///=====================================================================
+        /// include procedure
+        ///=====================================================================
         if(!$response_data) { $response_data = include $path_proc; }
 
         // cached body
@@ -127,6 +140,7 @@ class rester
      * Path to procedure file
      *
      * @return bool|string
+     * @throws Exception
      */
     protected static function path_proc()
     {
@@ -238,6 +252,19 @@ class rester
         if(isset(self::$request_param[$key])) return self::$request_param[$key];
         if($key == null) return self::$request_param;
         return false;
+    }
+
+    /**
+     * @param string $section
+     * @param string $key
+     *
+     * @return string|array
+     */
+    public static function cfg($section='', $key='')
+    {
+        if($section==='') return self::$cfg;
+        if($section && $key) return self::$cfg[$section][$key];
+        return self::$cfg[$section];
     }
 
     /**
