@@ -1,0 +1,169 @@
+<?php
+/**
+ *	@class		cfg
+ *	@author	    Kevin Park (kevinpark@webace.co.kr)
+ *	@version	1.0
+ *	@brief		기본 설정 정보
+ *	@date	    2018.04.25 - 생성
+ */
+class cfg
+{
+    const query_version = 'v';
+    const query_module = 'm';
+    const query_proc = 'proc';
+    private static $name = 'rester.ini';  // 파일명
+    private static $data;	// 설정정보
+
+    const key_module = 'm';
+    const key_function = 'fn';
+
+    protected static $default = array(
+
+        'access_control'=>array(
+            'allows_origin'=>'*'
+        ),
+
+        'default'=>array(
+            'debug_mode'=>false,
+            'timezone'=>'Asia/Seoul'
+        )
+
+    );
+
+    /**
+     * @return string
+     */
+    public static function module() { return self::Get('module'); }
+
+    /**
+     * @return string
+     */
+    public static function proc() { return self::Get('proc'); }
+
+    /**
+     * @return string
+     */
+    public static function request_method() { return strtolower(self::Get('method')); }
+
+    /**
+     * @return array
+     */
+    public static function parameter() { return self::Get('request-body'); }
+
+    /**
+     * @return string
+     */
+    public static function token() { return self::Get('request-body','token'); }
+
+    /**
+     * @return array
+     */
+    public static function cache() { return self::Get('cache'); }
+
+    /**
+     * Initialize default config
+     *
+     * @throws Exception
+     */
+    private static function init()
+    {
+        // 환경설정 파일 로드
+        $path = dirname(__FILE__).'/../../../cfg/'.self::$name;
+        if(is_file($path)) $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
+        else throw new Exception("There is no config file.(rester.ini)");
+
+        // Set default value
+        foreach (self::$default as $k=>$v)
+        {
+            foreach ($v as $kk => $vv)
+            {
+                if (!isset($cfg[$k][$kk])) $cfg[$k][$kk] = $vv;
+            }
+        }
+
+        // Extract access control
+        if($cfg['access_control']['allows_origin']!='*') $cfg['access_control']['allows_origin'] = explode(',', $cfg['access_control']['allows_origin']);
+        array_walk_recursive($cfg, function(&$v) { $v = trim($v); });
+
+        // extract version
+        if(preg_match('/^[0-9][0-9.]*$/i',$_GET[self::query_version],$matches))
+        {
+            $cfg['version'] = $matches[0];
+        }
+        else
+        {
+            if($_GET[self::query_version]=='') throw new Exception("Access denied.(root directory)");
+            else throw new Exception("Invalid version name.");
+        }
+        unset($_GET[self::query_version]);
+
+        // Check module name
+        if(preg_match('/^[a-z0-9-_]*$/i',strtolower($_GET[self::query_module]),$matches)) $cfg['module'] = $matches[0];
+        else throw new Exception("Invalid module name.");
+        unset($_GET[self::query_module]);
+
+        // Check procedure name
+        if(preg_match('/^[a-z0-9-_]*$/i',strtolower($_GET[self::query_proc]),$matches)) $cfg['proc'] = $matches[0];
+        else throw new Exception("Invalid procedure name.");
+        unset($_GET[self::query_proc]);
+
+        // Check method
+        if($_SERVER['REQUEST_METHOD']=='POST' ||$_SERVER['REQUEST_METHOD']=='GET') $cfg['method'] = $_SERVER['REQUEST_METHOD'];
+        else throw new Exception("Invalid request METHOD.(Allowed POST,GET)");
+
+        // Check allows ip address
+        if($cfg['access_control']['allows_origin']!='*')
+        {
+            if(!is_array($cfg['access_control']['allows_origin'])) $cfg['access_control']['allows_origin'] = array($cfg['access_control']['allows_origin']);
+            if(!in_array(GetRealIPAddr(),$cfg['access_control']['allows_origin'])) throw new Exception("Access denied.(Not allowed ip address)");
+        }
+
+        // Extract request parameter
+        // Json, POST, GET
+        $cfg['request-body'] = array();
+        if($body = json_decode(file_get_contents('php://input'),true))
+        {
+            $cfg['request-body'] = $body;
+        }
+        else
+        {
+            $cfg['request-body'] = $_POST;
+            unset($_POST);
+        }
+
+        foreach ($_GET as $k=>$v)
+        {
+            if(!isset($cfg['request-body'][$k])) $cfg['request-body'][$k] = $v;
+        }
+        unset($_GET);
+
+        self::$data = $cfg;
+    }
+
+    /**
+     * return config
+     *
+     * @param string $section
+     * @param string $key
+     *
+     * @return array|string
+     */
+    public static function Get($section='', $key='')
+    {
+        if(!isset(self::$data))
+        {
+            try
+            {
+                self::init();
+            }
+            catch (Exception $e)
+            {
+                echo $e->getMessage();
+                exit;
+            }
+        }
+        if($section==='') return self::$data;
+        if($section && $key) return self::$data[$section][$key];
+        return self::$data[$section];
+    }
+}

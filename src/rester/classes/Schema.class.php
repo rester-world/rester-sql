@@ -1,0 +1,294 @@
+<?php
+/**
+ * Class Schema
+ * kevinpark@webace.co.kr
+ *
+ * 스키마 정의를 받아서 validation을 수행해 줌
+ *
+ */
+class Schema
+{
+    const FIELD_TYPE = 'type';
+    const FIELD_REQUIRE = 'require';
+    const FIELD_DEFAULT = 'default';
+    const FIELD_REGEXP = 'regexp';
+    const FIELD_OPTIONS = 'options';
+
+    const TYPE_REGEX = 'regexp';
+    const TYPE_FUNCTION = 'function';
+    const TYPE_FILTER = 'filter';
+    const TYPE_FILENAME = 'filename';
+    const TYPE_ID = 'id';
+    const TYPE_DATETIME = 'datetime';
+    const TYPE_DATE = 'date';
+    const TYPE_TIME = 'time';
+    const TYPE_ARRAY = 'array';
+    const TYPE_TOKEN = 'token';
+
+    /**
+     * @var array 지원되는 타입 목록
+     */
+    private $types = array(
+        self::TYPE_REGEX,
+        self::TYPE_FUNCTION,
+        self::TYPE_FILENAME,
+        self::TYPE_ID,
+        self::TYPE_DATETIME,
+        self::TYPE_DATE,
+        self::TYPE_TIME,
+        self::TYPE_ARRAY,
+        self::TYPE_TOKEN,
+    );
+
+    private $schema = array('token'=>array('type'=>'token'));
+
+    /**
+     * Schema constructor.
+     *
+     * @param string $schema json file | .ini file path
+     *
+     * @throws Exception
+     */
+    public function __construct($schema)
+    {
+        try
+        {
+            // ini,json file
+            if(is_file($schema))
+            {
+                $ext = array_pop(explode('.',$schema));
+                if($ext == 'ini') $this->set_schema_file_ini($schema);
+                elseif($ext == 'json') $this->set_schema_file_json($schema);
+                else throw new Exception("Not supported file format.");
+            }
+            // error : not support
+            else
+            {
+                throw new Exception("Not supported schema format.(.ini, .json)");
+            }
+        }
+        catch (Exception $e) { throw $e; }
+    }
+
+    /**
+     * insert json file schema
+     *
+     * @param string $file_path
+     *
+     * @throws Exception
+     */
+    protected function set_schema_file_json($file_path)
+    {
+        try { $this->set_schema(json_decode(file_get_contents($file_path),true)); }
+        catch (Exception$e) { throw $e; }
+    }
+
+    /**
+     * insert ini file schema
+     *
+     * @param string $file_path
+     *
+     * @throws Exception
+     */
+    protected function set_schema_file_ini($file_path)
+    {
+        try { $this->set_schema(parse_ini_file($file_path,true, INI_SCANNER_RAW)); }
+        catch (Exception$e) { throw $e; }
+    }
+
+    /**
+     * 스키마를 설정함
+     *
+     * @param array $data
+     *
+     * 스키마구조
+     * ----------
+     * key[type] 필수
+     * key[regexp] 정규식 (type=regexp)
+     * key[filter] integer php 함수의 필터값 (type=filter)
+     * key[options] integer php 함수의 옵션값 (type=filter)
+     *
+     * @throws Exception
+     */
+    protected function set_schema($data)
+    {
+        // check parameter
+        if(!is_array($data)) throw new Exception("Invalid parameter.(array)");
+
+        foreach ($data as $k=>$v)
+        {
+            // 필드타입에 따라 옵션으로 필수로 받는 내용이 달라진다.
+            switch ($v['type'])
+            {
+                case self::TYPE_REGEX: if(!isset($v[self::TYPE_REGEX])) throw new Exception("Required parameter.[regexp]"); break;
+                case self::TYPE_FILTER: if(!isset($v[self::TYPE_FILTER])) throw new Exception("Required parameter.[filter]"); break;
+                default: if(!in_array($v['type'], $this->types)) throw new Exception("Not supported type. ({$v['type']})");
+            }
+        }
+        $data['token'] = array('type'=>'token');
+        $this->schema = array_merge($this->schema,$data);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function validate($data)
+    {
+        // check param
+        if(is_array($data) && sizeof($data)==0) return array();
+        $keys = array_keys($data);
+        if(!is_array($data) || (array_keys($keys) === $keys)) throw new Exception("Invalid parameter.(associative array)");
+
+        $result = array();
+
+        foreach ($data as $k=>$v)
+        {
+            if(!($schema = $this->schema[$k])) continue;
+
+            $type = $schema[self::FIELD_TYPE];
+            $require = $schema[self::FIELD_REQUIRE]=='true'?true:false;
+            // set default value
+            if(isset($schema[self::FIELD_DEFAULT])) $result[$k] = $schema[self::FIELD_DEFAULT];
+
+            switch ($type)
+            {
+                // Using Regular Expressions : preg_match
+                case self::TYPE_REGEX: if (preg_match($schema['regexp'], $v, $matches)) $result[$k] = $matches[0]; break;
+
+                // php validate function
+                // filter_val
+                case self::TYPE_FILTER:
+
+                    $filter = null;
+                    $options = null;
+                    eval("\$filter = " . $schema[self::TYPE_FILTER] . ";");
+                    if($schema[self::FIELD_OPTIONS]) eval("\$options = " . $schema[self::FIELD_OPTIONS] . ";");
+
+                    if(!is_integer($filter)) throw new Exception($k.'='.$v." : Invalid filter format.");
+                    if($options !== null && !is_integer($options)) throw new Exception($k.'='.$v." : Filter option format is invalid.");
+                    if (false !== ($clean = filter_var($v, $filter, $options))) $result[$k] = $clean;
+                    break;
+
+                // User Define Function
+                // 사용자 정의 함수는 호출 가능할 때만 실행
+                case self::TYPE_FUNCTION:
+                    $func = $k;
+                    if (is_callable($func) && ($clean = $func($v))) $result[$k] = $clean;
+                    break;
+
+                // rester define function
+                default:
+                    $func = 'validate_' . $this->schema[$k]['type'];
+                    if (method_exists($this, $func)) $result[$k] = $this->$func($v);
+                    else throw new Exception($k.'='.$v." : There is no Rester definition function.");
+            }
+
+            // Check Require value
+            if(!isset($result[$k]) && $require)
+            {
+                throw new Exception($k." : The required input data does not have a value or pass validation.");
+            }
+
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_id($data)
+    {
+        if(preg_match('/^[a-zA-Z][a-zA-Z0-9_\-:.]*$/', $data, $matches)) return $data;
+        throw new Exception("아이디에 허용되지 않은 문자가 있습니다. 허용문자(영문, 숫자, -, _, :, .)");
+    }
+
+    /**
+     * 날짜 형식 채크
+     *
+     * @param string $data
+     *
+     * @return bool|string
+     * @throws Exception
+     */
+    protected function validate_datetime($data)
+    {
+        $parsed = date_parse($data);
+        if($parsed['error_count']===0) return $data;
+        throw new Exception("날짜/시간 형식이 잘못되었습니다.");
+    }
+
+    /**
+     * 날짜 형식 체크
+     *
+     * @param string $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_date($data)
+    {
+        $parsed = date_parse($data);
+        if(
+            $parsed['error_count']===0 &&
+            $parsed['year']!==false && $parsed['month']!==false && $parsed['day']!==false &&
+            $parsed['hour']===false && $parsed['minute']===false && $parsed['second']===false
+        )
+            return $data;
+        throw new Exception("날짜 형식이 맞지 않습니다.");
+    }
+
+    /**
+     * 시간형식 체크
+     *
+     * @param string $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_time($data)
+    {
+        $parsed = date_parse($data);
+        if(
+            $parsed['error_count']===0 &&
+            $parsed['year']===false && $parsed['month']===false && $parsed['day']===false &&
+            $parsed['hour']!==false && $parsed['minute']!==false && $parsed['second']!==false
+        )
+            return $data;
+        throw new Exception("시간 형식이 맞지 않습니다.");
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     * @throws Exception
+     */
+    protected function validate_array($data)
+    {
+        if(is_array($data)) return $data;
+        throw new Exception("배열이 아닙니다.");
+    }
+
+
+    /**
+     * 파일명 검증
+     * 파일명에 쓸 수 없는 9가지 문자가 있으면 안됨
+     * \ / : * ? " < > |
+     *
+     * @param string $data
+     *
+     * @return null|string|string[]
+     * @throws Exception
+     */
+    protected function validate_filename($data)
+    {
+        if(preg_match('/[\\/:\*\?\"<>\|]/', $data, $matches)) throw new Exception("파일명에는 특수문자가 올 수 없습니다.");
+        return $data;
+    }
+}
