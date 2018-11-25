@@ -32,31 +32,37 @@ class cfg
 
     /**
      * @return string
+     * @throws Exception
      */
     public static function module() { return self::Get('module'); }
 
     /**
      * @return string
+     * @throws Exception
      */
     public static function proc() { return self::Get('proc'); }
 
     /**
      * @return string
+     * @throws Exception
      */
     public static function request_method() { return strtolower(self::Get('method')); }
 
     /**
      * @return array
+     * @throws Exception
      */
     public static function parameter() { return self::Get('request-body'); }
 
     /**
      * @return string
+     * @throws Exception
      */
     public static function token() { return self::Get('request-body','token'); }
 
     /**
      * @return array
+     * @throws Exception
      */
     public static function cache() { return self::Get('cache'); }
 
@@ -67,7 +73,7 @@ class cfg
      */
     private static function init()
     {
-        // 환경설정 파일 로드
+        // Load config
         $path = dirname(__FILE__).'/../../../cfg/'.self::$name;
         if(is_file($path)) $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
         else throw new Exception("There is no config file.(rester.ini)");
@@ -112,7 +118,7 @@ class cfg
         else throw new Exception("Invalid request METHOD.(Allowed POST,GET)");
 
         // Check allows ip address
-        //check ip from share internet
+        // Check ip from share internet
         if (!empty($_SERVER['HTTP_CLIENT_IP']))
         {
             $access_ip=$_SERVER['HTTP_CLIENT_IP'];

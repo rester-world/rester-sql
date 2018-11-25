@@ -60,7 +60,6 @@ class rester
         if($path_verify = self::path_verify())
         {
             $schema = new Schema($path_verify);
-
             try
             {
                 if($data = $schema->validate(cfg::parameter()))
@@ -74,7 +73,6 @@ class rester
 
         ///=====================================================================
         /// check file
-        /// check auth,cache
         ///=====================================================================
         $path_proc = self::path_proc();
         if(false === $path_proc)
@@ -130,7 +128,7 @@ class rester
     }
 
     /**
-     * Path to module
+     * Path module
      *
      * @return string
      */
@@ -177,6 +175,7 @@ class rester
      * Path to config file
      *
      * @return bool|string
+     * @throws Exception
      */
     public static function path_cfg()
     {
@@ -194,6 +193,7 @@ class rester
      * Path to verify file
      *
      * @return bool|string
+     * @throws Exception
      */
     protected static function path_verify()
     {
@@ -216,6 +216,7 @@ class rester
      * Path to verify file
      *
      * @return bool|string
+     * @throws Exception
      */
     protected static function path_verify_func()
     {

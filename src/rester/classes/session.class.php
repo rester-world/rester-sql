@@ -35,18 +35,24 @@ class session
         if(!($redis_cfg['host'] && $redis_cfg['port'])) throw new Exception("Require cache config to use auth.");
 
         $redis = new Redis();
-        $redis->connect($redis_cfg['host'], $redis_cfg['port']);
-        if($redis_cfg['auth']) $redis->auth($redis_cfg['auth']);
-
-        if($session_id = $redis->get('token_'.$token))
+        if($redis->connect($redis_cfg['host'], $redis_cfg['port'], 1.0))
         {
-            self::$session_id =  $session_id;
-            $redis->close();
+            if($redis_cfg['auth']) $redis->auth($redis_cfg['auth']);
+
+            if($session_id = $redis->get('token_'.$token))
+            {
+                self::$session_id =  $session_id;
+                $redis->close();
+            }
+            else
+            {
+                $redis->close();
+                throw new Exception("Can not access interface: require login token.");
+            }
         }
         else
         {
-            $redis->close();
-            throw new Exception("Can not access interface: require login token.");
+            throw new Exception("Can not access redis server.");
         }
         return $session_id;
     }

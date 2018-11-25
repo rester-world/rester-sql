@@ -3,7 +3,7 @@
  * Class Schema
  * kevinpark@webace.co.kr
  *
- * 스키마 정의를 받아서 validation을 수행해 줌
+ * 스키마 정의를 받아서 validation 을 수행해 줌
  *
  */
 class Schema
