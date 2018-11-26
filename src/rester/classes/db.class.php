@@ -13,36 +13,37 @@ class db
     /**
      * @param string $config_name
      *
-     * @return PDO
-     * @throws Exception
+     * @return bool|PDO
      */
     public static function get($config_name='default')
     {
-        if(!is_string($config_name)) throw new Exception("The parameter must be a string.");
-
-        // 처음 호출이면 아래 내용 실행
-        if (self::$inst[$config_name] == null)
+        try
         {
-            $cfg = cfg::Get('database',$config_name);
+            if(!is_string($config_name)) throw new Exception("The parameter must be a string.");
 
-            if(!$cfg) throw new Exception("There is no {$config_name} database setting.");
-            if(!$cfg['type']) throw new Exception("There is no {$config_name}['type'] database setting.");
-            if(!$cfg['host']) throw new Exception("There is no {$config_name}['host'] database setting.");
-            if(!$cfg['user']) throw new Exception("There is no {$config_name}['user'] database setting.");
-            if(!$cfg['password']) throw new Exception("There is no {$config_name}['password'] database setting.");
-            if(!$cfg['database']) throw new Exception("There is no {$config_name}['database'] database setting.");
+            // 처음 호출이면 아래 내용 실행
+            if (self::$inst[$config_name] == null)
+            {
+                $cfg = cfg::Get('database',$config_name);
 
-            try
-            {
-                $dsn = self::create_dsn($cfg);
-                self::$inst[$config_name] = new PDO($dsn, $cfg['user'], $cfg['password']);
+                if(!$cfg) throw new Exception("There is no {$config_name} database setting.");
+                if(!$cfg['type']) throw new Exception("There is no {$config_name}['type'] database setting.");
+                if(!$cfg['host']) throw new Exception("There is no {$config_name}['host'] database setting.");
+                if(!$cfg['user']) throw new Exception("There is no {$config_name}['user'] database setting.");
+                if(!$cfg['password']) throw new Exception("There is no {$config_name}['password'] database setting.");
+                if(!$cfg['database']) throw new Exception("There is no {$config_name}['database'] database setting.");
+
+                    $dsn = self::create_dsn($cfg);
+                    self::$inst[$config_name] = new PDO($dsn, $cfg['user'], $cfg['password']);
             }
-            catch (Exception $e)
-            {
-                throw $e;
-            }
+            return self::$inst[$config_name];
         }
-        return self::$inst[$config_name];
+        catch (Exception $e)
+        {
+            rester::failure();
+            rester::msg($e->getMessage());
+            return false;
+        }
     }
 
     /**
