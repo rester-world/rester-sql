@@ -25,21 +25,6 @@ class Schema
     const TYPE_ARRAY = 'array';
     const TYPE_TOKEN = 'token';
 
-    /**
-     * @var array 지원되는 타입 목록
-     */
-    private $types = array(
-        self::TYPE_REGEX,
-        self::TYPE_FUNCTION,
-        self::TYPE_FILENAME,
-        self::TYPE_ID,
-        self::TYPE_DATETIME,
-        self::TYPE_DATE,
-        self::TYPE_TIME,
-        self::TYPE_ARRAY,
-        self::TYPE_TOKEN,
-    );
-
     private $schema = array('token'=>array('type'=>'token'));
 
     /**
@@ -122,7 +107,9 @@ class Schema
             {
                 case self::TYPE_REGEX: if(!isset($v[self::TYPE_REGEX])) throw new Exception("Required parameter.[regexp]"); break;
                 case self::TYPE_FILTER: if(!isset($v[self::TYPE_FILTER])) throw new Exception("Required parameter.[filter]"); break;
-                default: if(!in_array($v['type'], $this->types)) throw new Exception("Not supported type. ({$v['type']})");
+                default:
+                    $func = 'validate_' . $v['type'];
+                    if (!method_exists($this, $func)) throw new Exception("Not supported type. ({$v['type']})");
             }
         }
         $data['token'] = array('type'=>'token');
@@ -288,7 +275,31 @@ class Schema
      */
     protected function validate_filename($data)
     {
-        if(preg_match('/[\\/:\*\?\"<>\|]/', $data, $matches)) throw new Exception("파일명에는 특수문자가 올 수 없습니다.");
+        if(preg_match('/[\\/:\*\?\"<>\|]/', $data, $matches)) throw new Exception("Invalid data(filename) : {$data}");
         return $data;
+    }
+
+    /**
+     * @param $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_token($data)
+    {
+        if(preg_match('/[0-9a-zA-Z.]+/', $data, $matches)) return $data;
+        throw new Exception("Invalid data(token) : {$data}");
+    }
+
+    /**
+     * @param $data
+     *
+     * @return int
+     * @throws Exception
+     */
+    protected function validate_key($data)
+    {
+        if(preg_match('/[1-9][0-9]*/', $data, $matches)) return intval($data);
+        throw new Exception("Invalid data(key) : {$data}");
     }
 }
