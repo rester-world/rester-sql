@@ -156,6 +156,8 @@ class rester
         $path = false;
         foreach (glob(implode('/',$path_array).'/'.$method.'*.php') as $filename)
         {
+            if(strpos($filename,self::file_verify_func)!==false) continue;
+
             $path = $filename;
             $filename_arr = explode('.',$filename);
             if(in_array('auth',$filename_arr)) { self::$check_auth = true; }
@@ -241,7 +243,7 @@ class rester
      * @param string $key
      * @param string $value
      */
-    public static function set_request_param($key, $value) { if($key && ($value || $value===0)) self::$request_param[$key] = $value; }
+    public static function set_request_param($key, $value) { self::$request_param[$key] = $value; }
 
     /**
      * 요청값 반환

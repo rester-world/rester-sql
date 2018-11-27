@@ -35,6 +35,7 @@ class db
 
                     $dsn = self::create_dsn($cfg);
                     self::$inst[$config_name] = new PDO($dsn, $cfg['user'], $cfg['password']);
+                    self::$inst[$config_name]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             }
             return self::$inst[$config_name];
         }
@@ -58,15 +59,15 @@ class db
 
         if ($db_type == "oracle" || $db_type == "orcl" || $db_type == "oci")
         {
-            $dns = "oci:dbname=//" . $db['host'] . ':' . $db['port'] . '/' . $db['database'];
+            $dns = "oci:dbname=//" . $db['host'] . ':' . $db['port'] . '/' . $db['database'].';charset=utf8';
         }
         elseif ($db_type == "mssql" || $db_type == "dblib")
         {
-            $dns = "dblib:host=" . $db['host'] . ':' . $db['port'] . ';dbname=' . $db['database'];
+            $dns = "dblib:host=" . $db['host'] . ':' . $db['port'] . ';dbname=' . $db['database'].';charset=utf8';
         }
         elseif($db_type == 'mysql')
         {
-            $dns = $db_type . ":host=" . $db['host'] . ";port=" . $db['port'] . ";dbname=" . $db['database'];
+            $dns = $db_type . ":host=" . $db['host'] . ";port=" . $db['port'] . ";dbname=" . $db['database'].';charset=utf8';
         }
         else
         {

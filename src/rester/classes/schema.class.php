@@ -107,7 +107,7 @@ class schema
             }
         }
         $data['token'] = array('type'=>'token');
-        $this->schema = array_merge($this->schema,$data);
+        $this->schema = $data;
     }
 
     /**
@@ -119,11 +119,20 @@ class schema
     public function validate($data)
     {
         // check param
-        if(is_array($data) && sizeof($data)==0) return array();
-        $keys = array_keys($data);
-        if(!is_array($data) || (array_keys($keys) === $keys)) throw new Exception("Invalid parameter.(associative array)");
+        if(!is_array($data)) return array();
+
+        if(sizeof($data)>0)
+        {
+            $keys = array_keys($data);
+            if(!is_array($data) || (array_keys($keys) === $keys)) throw new Exception("Invalid parameter.(associative array)");
+        }
 
         $result = array();
+        // set default value
+        foreach($this->schema as $k=>$v)
+        {
+            if(isset($v[self::FIELD_DEFAULT])) $result[$k] = $v[self::FIELD_DEFAULT];
+        }
 
         foreach ($data as $k=>$v)
         {
@@ -131,8 +140,6 @@ class schema
 
             $type = $schema[self::FIELD_TYPE];
             $require = $schema[self::FIELD_REQUIRE]=='true'?true:false;
-            // set default value
-            if(isset($schema[self::FIELD_DEFAULT])) $result[$k] = $schema[self::FIELD_DEFAULT];
 
             switch ($type)
             {
@@ -174,6 +181,7 @@ class schema
             }
 
         }
+
         return $result;
     }
 
@@ -293,7 +301,7 @@ class schema
      */
     protected function validate_module($data)
     {
-        if(preg_match('/^[a-zA-Z][0-9a-zA-Z]*$/', $data, $matches)) return $data;
+        if(preg_match('/^[a-zA-Z][0-9a-zA-Z_-]*$/', $data, $matches)) return $data;
         throw new Exception("Invalid data(module name) : {$data}");
     }
 
@@ -329,7 +337,7 @@ class schema
      */
     protected function validate_mime($data)
     {
-        if(preg_match('/^[0-9a-zA-z\/-\._]+$/', $data, $matches)) return $data;
+        if(preg_match('/^[0-9a-zA-z\/\.\-\_]+$/', $data, $matches)) return $data;
         throw new Exception("Invalid data(mime) : {$data}");
     }
 
@@ -337,11 +345,20 @@ class schema
      * @param $data
      *
      * @return string
-     * @throws Exception
      */
     protected function validate_string($data)
     {
         return filter_var($data,FILTER_SANITIZE_STRING);
+    }
+
+    /**
+     * @param $data
+     *
+     * @return string
+     */
+    protected function validate_url($data)
+    {
+        return filter_var($data,FILTER_VALIDATE_URL);
     }
 }
 
