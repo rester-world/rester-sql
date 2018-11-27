@@ -6,7 +6,7 @@
  * 스키마 정의를 받아서 validation 을 수행해 줌
  *
  */
-class Schema
+class schema
 {
     const FIELD_TYPE = 'type';
     const FIELD_REQUIRE = 'require';
@@ -17,13 +17,6 @@ class Schema
     const TYPE_REGEX = 'regexp';
     const TYPE_FUNCTION = 'function';
     const TYPE_FILTER = 'filter';
-    const TYPE_FILENAME = 'filename';
-    const TYPE_ID = 'id';
-    const TYPE_DATETIME = 'datetime';
-    const TYPE_DATE = 'date';
-    const TYPE_TIME = 'time';
-    const TYPE_ARRAY = 'array';
-    const TYPE_TOKEN = 'token';
 
     private $schema = array('token'=>array('type'=>'token'));
 
@@ -107,6 +100,7 @@ class Schema
             {
                 case self::TYPE_REGEX: if(!isset($v[self::TYPE_REGEX])) throw new Exception("Required parameter.[regexp]"); break;
                 case self::TYPE_FILTER: if(!isset($v[self::TYPE_FILTER])) throw new Exception("Required parameter.[filter]"); break;
+                case self::TYPE_FUNCTION: break;
                 default:
                     $func = 'validate_' . $v['type'];
                     if (!method_exists($this, $func)) throw new Exception("Not supported type. ({$v['type']})");
@@ -192,7 +186,7 @@ class Schema
     protected function validate_id($data)
     {
         if(preg_match('/^[a-zA-Z][a-zA-Z0-9_\-:.]*$/', $data, $matches)) return $data;
-        throw new Exception("아이디에 허용되지 않은 문자가 있습니다. 허용문자(영문, 숫자, -, _, :, .)");
+        throw new Exception("Invalid data(id) : {$data} (a-z, A-z, 0-9, -, _, :, .)");
     }
 
     /**
@@ -207,7 +201,7 @@ class Schema
     {
         $parsed = date_parse($data);
         if($parsed['error_count']===0) return $data;
-        throw new Exception("날짜/시간 형식이 잘못되었습니다.");
+        throw new Exception("Invalid data(datetime) : {$data}");
     }
 
     /**
@@ -227,7 +221,7 @@ class Schema
             $parsed['hour']===false && $parsed['minute']===false && $parsed['second']===false
         )
             return $data;
-        throw new Exception("날짜 형식이 맞지 않습니다.");
+        throw new Exception("Invalid data(date) : {$data}");
     }
 
     /**
@@ -247,7 +241,7 @@ class Schema
             $parsed['hour']!==false && $parsed['minute']!==false && $parsed['second']!==false
         )
             return $data;
-        throw new Exception("시간 형식이 맞지 않습니다.");
+        throw new Exception("Invalid data(time) : {$data}");
     }
 
     /**
@@ -259,7 +253,7 @@ class Schema
     protected function validate_array($data)
     {
         if(is_array($data)) return $data;
-        throw new Exception("배열이 아닙니다.");
+        throw new Exception("Invalid data(array) : {$data}");
     }
 
 
@@ -287,8 +281,20 @@ class Schema
      */
     protected function validate_token($data)
     {
-        if(preg_match('/[0-9a-zA-Z.]+/', $data, $matches)) return $data;
+        if(preg_match('/^[0-9a-zA-Z.]+$/', $data, $matches)) return $data;
         throw new Exception("Invalid data(token) : {$data}");
+    }
+
+    /**
+     * @param $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_module($data)
+    {
+        if(preg_match('/^[a-zA-Z][0-9a-zA-Z]*$/', $data, $matches)) return $data;
+        throw new Exception("Invalid data(module name) : {$data}");
     }
 
     /**
@@ -299,7 +305,43 @@ class Schema
      */
     protected function validate_key($data)
     {
-        if(preg_match('/[1-9][0-9]*/', $data, $matches)) return intval($data);
+        if(preg_match('/^[1-9][0-9]*$/', $data, $matches)) return intval($data);
         throw new Exception("Invalid data(key) : {$data}");
     }
+
+    /**
+     * @param $data
+     *
+     * @return int
+     * @throws Exception
+     */
+    protected function validate_number($data)
+    {
+        if(preg_match('/^[0-9]+$/', $data, $matches)) return intval($data);
+        throw new Exception("Invalid data(number) : {$data}");
+    }
+
+    /**
+     * @param $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_mime($data)
+    {
+        if(preg_match('/^[0-9a-zA-z\/-\._]+$/', $data, $matches)) return $data;
+        throw new Exception("Invalid data(mime) : {$data}");
+    }
+
+    /**
+     * @param $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_string($data)
+    {
+        return filter_var($data,FILTER_SANITIZE_STRING);
+    }
 }
+

@@ -59,7 +59,7 @@ class rester
         ///=====================================================================
         if($path_verify = self::path_verify())
         {
-            $schema = new Schema($path_verify);
+            $schema = new schema($path_verify);
             try
             {
                 if($data = $schema->validate(cfg::parameter()))
