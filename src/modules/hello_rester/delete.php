@@ -1,16 +1,17 @@
 <?php if(!defined('__RESTER__')) exit;
 
-// TODO delete 예제 넣기
-
-$rows = rester::cfg('rows');
-$query = " SELECT * FROM example LIMIT {$rows} ";
+$query = " SELECT * FROM example LIMIT 1 ";
 
 $pdo = db::get();
 
-$list = [];
+$deleted_row = [];
 foreach($pdo->query($query,PDO::FETCH_ASSOC) as $row)
 {
-    $list[] = $row;
+    $pdo->query("DELETE FROM `example` WHERE no={$row['no']} ");
+    $deleted_row[] = $row;
 }
 
-return $list;
+return [
+    'Delete one row!',
+    $deleted_row
+];
