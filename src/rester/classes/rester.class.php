@@ -20,7 +20,7 @@ class rester
     protected static $msg = array();
     protected static $warning = array();
 
-    protected static $cfg;
+    protected static $cfg = [];
     protected static $check_auth = false;
     protected static $use_cache = false;
     protected static $cache_timeout;
@@ -44,7 +44,28 @@ class rester
     {
         $module = cfg::module();
         $proc = cfg::proc();
-        $method = cfg::request_method();
+
+        ///=====================================================================
+        /// include config.ini
+        /// Must included first!
+        /// Use another function.
+        ///=====================================================================
+        $cfg = array();
+        if($path = self::path_cfg())
+        {
+            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
+        }
+        self::$cfg = $cfg;
+
+        ///=====================================================================
+        /// check cache option and auth option
+        ///=====================================================================
+        if(self::cfg('auth',cfg::proc())) self::$check_auth = true;
+        if(self::cfg('cache',cfg::proc()))
+        {
+            self::$use_cache = true;
+            self::$cache_timeout = self::cfg('cache',cfg::proc());
+        }
 
         ///=====================================================================
         /// include verify function
@@ -72,6 +93,7 @@ class rester
             }
         }
 
+
         ///=====================================================================
         /// check file
         ///=====================================================================
@@ -90,11 +112,12 @@ class rester
         /// check cache
         ///=====================================================================
         $redis_cfg = cfg::cache();
-        if(self::$use_cache && !($redis_cfg['host'] && $redis_cfg['port'])) throw new Exception("Require cache config to use cache.");
+        if(self::$use_cache && !($redis_cfg['host'] && $redis_cfg['port']))
+            throw new Exception("Require cache config to use cache.");
 
         $response_data = null;
         $redis = new Redis();
-        $cache_key = implode('_', array_merge(array($module,$proc,$method),self::param()));
+        $cache_key = implode('_', array_merge(array($module,$proc),self::param()));
         if(self::$use_cache)
         {
             $redis->connect($redis_cfg['host'], $redis_cfg['port']);
@@ -102,16 +125,6 @@ class rester
             // get cached data
             $response_data = json_decode($redis->get($cache_key),true);
         }
-
-        ///=====================================================================
-        /// include config.ini
-        ///=====================================================================
-        $cfg = array();
-        if($path = self::path_cfg())
-        {
-            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
-        }
-        self::$cfg = $cfg;
 
         ///=====================================================================
         /// include procedure
@@ -143,35 +156,14 @@ class rester
      */
     protected static function path_proc()
     {
-        if($timeout = intval(cfg::Get('cache','timeout'))) self::$cache_timeout = $timeout;
-        $module_name = cfg::module();
-        $proc_name = cfg::proc();
-
-        $method = strtolower(cfg::request_method());
-        $path_array = array(
+        $path = implode('/',array(
             self::path_module(),
-            $module_name,
-            $proc_name
-        );
+            cfg::module(),
+            cfg::proc().'.php'
+        ));
 
-        $path = false;
-        foreach (glob(implode('/',$path_array).'/'.$method.'*.php') as $filename)
-        {
-            if(strpos($filename,self::file_verify_func)!==false) continue;
-
-            $path = $filename;
-            $filename_arr = explode('.',$filename);
-            if(in_array('auth',$filename_arr)) { self::$check_auth = true; }
-            array_walk($filename_arr, function($item){
-                if(strpos($item,'cache')!==false)
-                {
-                    self::$use_cache = true;
-                    if($timeout = intval(explode('_',$item)[1])) self::$cache_timeout = $timeout;
-                }
-            });
-            break;
-        }
-        return $path;
+        if(is_file($path)) return $path;
+        return false;
     }
 
     /**
@@ -202,13 +194,11 @@ class rester
     {
         $module_name = cfg::module();
         $proc_name = cfg::proc();
-        $method = cfg::request_method();
 
         $path = implode('/',array(
             self::path_module(),
             $module_name,
-            $proc_name,
-            $method.'.'.self::file_verify
+            $proc_name.'.'.self::file_verify
         ));
 
         if(is_file($path)) return $path;
@@ -225,13 +215,11 @@ class rester
     {
         $module_name = cfg::module();
         $proc_name = cfg::proc();
-        $method = cfg::request_method();
 
         $path = implode('/',array(
             self::path_module(),
             $module_name,
-            $proc_name,
-            $method.'.'.self::file_verify_func
+            $proc_name.'.'.self::file_verify_func
         ));
 
         if(is_file($path)) return $path;
@@ -239,7 +227,7 @@ class rester
     }
 
     /**
-     * 요청바디 설정
+     * set request body
      *
      * @param string $key
      * @param string $value
@@ -247,7 +235,8 @@ class rester
     public static function set_request_param($key, $value) { self::$request_param[$key] = $value; }
 
     /**
-     * 요청값 반환
+     * return analyzed parameter
+     *
      * @param null|string $key
      * @return bool|mixed
      */
@@ -299,7 +288,7 @@ class rester
      */
     public static function warning($msg=null)
     {
-        if($msg===null) return self::$msg;
+        if($msg===null) return self::$warning;
         else self::$warning[] = $msg;
         return null;
     }

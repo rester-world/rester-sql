@@ -43,12 +43,6 @@ class cfg
     public static function proc() { return self::Get('proc'); }
 
     /**
-     * @return string
-     * @throws Exception
-     */
-    public static function request_method() { return strtolower(self::Get('method')); }
-
-    /**
      * @return array
      * @throws Exception
      */
@@ -114,8 +108,8 @@ class cfg
         unset($_GET[self::query_proc]);
 
         // Check method
-        if($_SERVER['REQUEST_METHOD']=='POST' ||$_SERVER['REQUEST_METHOD']=='GET') $cfg['method'] = $_SERVER['REQUEST_METHOD'];
-        else throw new Exception("Invalid request METHOD.(Allowed POST,GET)");
+        if($_SERVER['REQUEST_METHOD']=='POST') $cfg['method'] = $_SERVER['REQUEST_METHOD'];
+        else throw new Exception("Invalid request METHOD.(Allowed POST)");
 
         // Check allows ip address
         // Check ip from share internet

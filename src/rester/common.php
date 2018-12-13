@@ -25,8 +25,8 @@ spl_autoload_register(function($class_name)
 /// catch 되지 않은 예외에 대한 처리함수
 ///=============================================================================
 set_exception_handler(function($e) {
-    echo $e;
-    exit;
+    rester::failure();
+    rester::msg($e);
 });
 
 

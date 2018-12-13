@@ -1,7 +1,5 @@
 <?php if(!defined('__RESTER__')) exit;
 
-rester::msg("Hello RESTer-SQL world!");
-
 $id = rester::param('session_id');
 $token = session::set($id);
 
