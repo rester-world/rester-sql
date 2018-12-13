@@ -2,6 +2,7 @@
 $response_body = array(
     'success'=>false,
     'msg'=>'',
+    'warning'=>[],
     'data'=>''
 );
 
@@ -10,6 +11,7 @@ try
     include_once('./rester/common.php');
     $response_body['data'] = rester::run();
     $response_body['msg'] = implode(',', rester::msg());
+    $response_body['warning'] = rester::warning();
     if(rester::isSuccess()) $response_body['success'] = true;
 }
 catch (Exception $e)

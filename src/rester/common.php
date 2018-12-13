@@ -33,14 +33,24 @@ set_exception_handler(function($e) {
 ///=============================================================================
 /// 오류출력설정
 ///=============================================================================
-if(cfg::Get('default', 'debug_mode')) error_reporting(E_ALL ^ (E_NOTICE | E_STRICT | E_WARNING | E_DEPRECATED));
-else error_reporting(0);
+try {
+    if (cfg::Get('default', 'debug_mode')) error_reporting(E_ALL ^ (E_NOTICE | E_STRICT | E_WARNING | E_DEPRECATED));
+    else error_reporting(0);
+} catch (Exception $e) {
+    rester::failure();
+    rester::msg($e->getMessage());
+}
 
 ///=============================================================================
 /// timezone 설정
 /// rester.ini
 ///=============================================================================
-date_default_timezone_set(cfg::Get('default','timezone'));
+try {
+    date_default_timezone_set(cfg::Get('default', 'timezone'));
+} catch (Exception $e) {
+    rester::failure();
+    rester::msg($e->getMessage());
+}
 
 ///=============================================================================
 /// set php.ini

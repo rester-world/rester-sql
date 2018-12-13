@@ -18,6 +18,7 @@ class rester
 
     protected static $success = true;
     protected static $msg = array();
+    protected static $warning = array();
 
     protected static $cfg;
     protected static $check_auth = false;
@@ -286,6 +287,20 @@ class rester
     {
         if($msg===null) return self::$msg;
         else self::$msg[] = $msg;
+        return null;
+    }
+
+    /**
+     * Add warning message
+     *
+     * @param null|string $msg
+     *
+     * @return array
+     */
+    public static function warning($msg=null)
+    {
+        if($msg===null) return self::$msg;
+        else self::$warning[] = $msg;
         return null;
     }
 
