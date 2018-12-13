@@ -18,7 +18,7 @@ services:
   ports:
     - 3306:3306
   volumes:
-    - //Github/rester-sql/example_db.sql:/docker-entrypoint-initdb.d/dump.sql
+    - ./example_db.sql:/docker-entrypoint-initdb.d/dump.sql
   environment:
    MYSQL_RANDOM_ROOT_PASSWORD: "true"
    MYSQL_DATABASE: "rester-sql"
@@ -33,8 +33,8 @@ services:
     - redis:cache.rester.kr
     - db:db.rester.kr
   volumes:
-   - //Github/rester-sql/default.conf:/etc/nginx/sites-available/default.conf:ro
-   - //Github/rester-sql/src:/var/www/html
-   - //Github/rester-sql/cfg:/var/www/cfg:ro
+   - ./default.conf:/etc/nginx/sites-available/default.conf:ro
+   - ./src:/var/www/html
+   - ./cfg:/var/www/cfg:ro
   ports:
   - '80:80'
