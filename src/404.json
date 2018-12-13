@@ -2,8 +2,8 @@
     "success": "false",
     "msg": "URL rule error",
     "data": {
-        "rule": "http://your-domain/v{version}/{module}/{function}",
-        "online-document": "http://doc.daium.kr",
+        "rule": "http://your-domain/v{version}/{module}/{procedure}",
+        "online-document": "http://rester.kr",
         "copyright": "rester.kr"
     }
 }
