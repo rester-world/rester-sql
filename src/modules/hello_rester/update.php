@@ -1,16 +1,27 @@
 <?php if(!defined('__RESTER__')) exit;
 
-// TODO Update 예제 넣기
-
-$rows = rester::cfg('rows');
-$query = " SELECT * FROM example LIMIT {$rows} ";
+$query = " SELECT * FROM example ORDER BY rand() LIMIT 1 ";
 
 $pdo = db::get();
 
-$list = [];
+$updated_row = [];
 foreach($pdo->query($query,PDO::FETCH_ASSOC) as $row)
 {
-    $list[] = $row;
+    $_key = rand(0,255);
+    $_value = rand(0,255);
+    $query = "UPDATE `example` SET `key`=:key, `value`=:value WHERE no={$row['no']} LIMIT 1 ";
+    $pdo->prepare($query)->execute([
+        'key'=>$_key,
+        'value'=>$_value
+    ]);
+    $updated_row['old'] = $row;
+    $updated_row['new'] = [
+        'key'=>$_key,
+        'value'=>$_value
+    ];
 }
 
-return $list;
+return [
+    'One row updated!',
+    $updated_row
+];
