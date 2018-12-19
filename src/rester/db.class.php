@@ -1,4 +1,8 @@
 <?php
+namespace rester\sql;
+use Exception;
+use PDO;
+
 /**
  * Class db
  * @author kevinpark@webace.co.kr

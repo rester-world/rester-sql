@@ -1,4 +1,7 @@
 <?php
+namespace rester\sql;
+use Exception;
+
 /**
  * Class Schema
  * kevinpark@webace.co.kr
