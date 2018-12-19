@@ -1,4 +1,9 @@
 <?php
+namespace rester\sql;
+use Exception;
+use PDO;
+use Redis;
+
 /**
  * Class rester
  * kevinpark@webace.co.kr
@@ -8,8 +13,6 @@
 class rester
 {
     const path_module = 'modules';
-    const file_verify_func = 'verify.php';
-    const file_verify = 'verify.ini';
     const file_config = 'config.ini';
 
     protected static $request_param = array();
@@ -45,11 +48,11 @@ class rester
         $module = cfg::module();
         $proc = cfg::proc();
 
-        ///=====================================================================
+        //=====================================================================
         /// include config.ini
         /// Must included first!
         /// Use another function.
-        ///=====================================================================
+        //=====================================================================
         $cfg = array();
         if($path = self::path_cfg())
         {
@@ -57,9 +60,9 @@ class rester
         }
         self::$cfg = $cfg;
 
-        ///=====================================================================
+        //=====================================================================
         /// check cache option and auth option
-        ///=====================================================================
+        //=====================================================================
         if(self::cfg('auth',cfg::proc())) self::$check_auth = true;
         if(self::cfg('cache',cfg::proc()))
         {
@@ -67,18 +70,18 @@ class rester
             self::$cache_timeout = self::cfg('cache',cfg::proc());
         }
 
-        ///=====================================================================
+        //=====================================================================
         /// include verify function
-        ///=====================================================================
+        //=====================================================================
         if($path_verify_func = self::path_verify_func())
         {
             include $path_verify_func;
         }
 
-        ///=====================================================================
+        //=====================================================================
         /// check request parameter
         /// check body | query string
-        ///=====================================================================
+        //=====================================================================
         if($path_verify = self::path_verify())
         {
             $schema = new schema($path_verify);
@@ -94,23 +97,25 @@ class rester
         }
 
 
-        ///=====================================================================
-        /// check file
-        ///=====================================================================
+        //=====================================================================
+        /// check files
+        //=====================================================================
+        $path_sql = self::path_sql();
         $path_proc = self::path_proc();
-        if(false === $path_proc)
+        if(false === $path_proc && false === $path_sql)
         {
             throw new Exception("Not found procedure. Module: {$module}, Procedure: {$proc} ");
         }
 
-        ///=====================================================================
+
+        //=====================================================================
         /// check auth
-        ///=====================================================================
+        //=====================================================================
         if(self::$check_auth) { session::get(cfg::token()); }
 
-        ///=====================================================================
+        //=====================================================================
         /// check cache
-        ///=====================================================================
+        //=====================================================================
         $redis_cfg = cfg::cache();
         if(self::$use_cache && !($redis_cfg['host'] && $redis_cfg['port']))
             throw new Exception("Require cache config to use cache.");
@@ -126,10 +131,26 @@ class rester
             $response_data = json_decode($redis->get($cache_key),true);
         }
 
-        ///=====================================================================
+        //=====================================================================
         /// include procedure
-        ///=====================================================================
-        if(!$response_data) { $response_data = include $path_proc; }
+        //=====================================================================
+        if(!$response_data)
+        {
+            if($path_sql)
+            {
+                $pdo = db::get();
+                $query = file_get_contents($path_sql);
+                $response_data = [];
+                foreach($pdo->query($query,PDO::FETCH_ASSOC) as $row)
+                {
+                    $response_data[] = $row;
+                }
+            }
+            elseif($path_proc)
+            {
+                $response_data = include $path_proc;
+            }
+        }
 
         // cached body
         if(self::$use_cache && !$redis->get($cache_key)) { $redis->set($cache_key,json_encode($response_data),self::$cache_timeout); }
@@ -146,7 +167,7 @@ class rester
      *
      * @return string
      */
-    protected static function path_module() { return dirname(__FILE__).'/../../'.self::path_module; }
+    protected static function path_module() { return dirname(__FILE__).'/../'.self::path_module; }
 
     /**
      * Path to procedure file
@@ -160,6 +181,24 @@ class rester
             self::path_module(),
             cfg::module(),
             cfg::proc().'.php'
+        ));
+
+        if(is_file($path)) return $path;
+        return false;
+    }
+
+    /**
+     * Path to procedure file
+     *
+     * @return bool|string
+     * @throws Exception
+     */
+    protected static function path_sql()
+    {
+        $path = implode('/',array(
+            self::path_module(),
+            cfg::module(),
+            cfg::proc().'.sql'
         ));
 
         if(is_file($path)) return $path;
@@ -198,7 +237,7 @@ class rester
         $path = implode('/',array(
             self::path_module(),
             $module_name,
-            $proc_name.'.'.self::file_verify
+            $proc_name.'.ini'
         ));
 
         if(is_file($path)) return $path;
@@ -219,7 +258,7 @@ class rester
         $path = implode('/',array(
             self::path_module(),
             $module_name,
-            $proc_name.'.'.self::file_verify_func
+            $proc_name.'.verify.php'
         ));
 
         if(is_file($path)) return $path;

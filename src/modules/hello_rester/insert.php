@@ -1,4 +1,6 @@
-<?php if(!defined('__RESTER__')) exit;
+<?php use rester\sql\db;
+
+if(!defined('__RESTER__')) exit;
 
 if($pdo = db::get())
 {

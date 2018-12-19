@@ -1,4 +1,8 @@
 <?php
+namespace rester\sql;
+use Exception;
+use Redis;
+
 /**
  * Class session
  * kevinpark@webace.co.kr

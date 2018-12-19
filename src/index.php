@@ -1,4 +1,7 @@
 <?php
+
+use rester\sql\rester;
+
 $response_body = array(
     'success'=>false,
     'msg'=>'',
@@ -9,7 +12,7 @@ $response_body = array(
 
 try
 {
-    include_once('./rester/common.php');
+    require_once './rester/common.php';
     $response_body['data'] = rester::run();
     $response_body['msg'] = implode(',', rester::msg());
     $response_body['warning'] = rester::warning();

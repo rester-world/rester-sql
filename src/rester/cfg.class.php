@@ -1,4 +1,7 @@
 <?php
+namespace rester\sql;
+use Exception;
+
 /**
  *	@class		cfg
  *	@author	    Kevin Park (kevinpark@webace.co.kr)
@@ -68,7 +71,7 @@ class cfg
     private static function init()
     {
         // Load config
-        $path = dirname(__FILE__).'/../../../cfg/'.self::$name;
+        $path = dirname(__FILE__).'/../../cfg/'.self::$name;
         if(is_file($path)) $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
         else throw new Exception("There is no config file.(rester.ini)");
 

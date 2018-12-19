@@ -1,4 +1,6 @@
-<?php if(!defined('__RESTER__')) exit;
+<?php use rester\sql\db;
+
+if(!defined('__RESTER__')) exit;
 
 $query = " SELECT * FROM example LIMIT 1 ";
 
