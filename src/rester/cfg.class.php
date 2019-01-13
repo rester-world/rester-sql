@@ -17,9 +17,6 @@ class cfg
     private static $name = 'rester.ini';  // 파일명
     private static $data;	// 설정정보
 
-    const key_module = 'm';
-    const key_function = 'fn';
-
     protected static $default = array(
 
         'access_control'=>array(
@@ -35,15 +32,35 @@ class cfg
 
     /**
      * @return string
-     * @throws Exception
      */
     public static function module() { return self::Get('module'); }
 
     /**
+     * @param string $module
      * @return string
-     * @throws Exception
+     */
+    public static function change_module($module)
+    {
+        $old = self::module();
+        self::$data['module'] = $module;
+        return $old;
+    }
+
+    /**
+     * @return string
      */
     public static function proc() { return self::Get('proc'); }
+
+    /**
+     * @param string $proc
+     * @return string
+     */
+    public static function change_proc($proc)
+    {
+        $old = self::proc();
+        self::$data['proc'] = $proc;
+        return $old;
+    }
 
     /**
      * @return array
@@ -68,7 +85,7 @@ class cfg
      *
      * @throws Exception
      */
-    private static function init()
+    public static function init()
     {
         // Load config
         $path = dirname(__FILE__).'/../../cfg/'.self::$name;
@@ -165,15 +182,9 @@ class cfg
      * @param string $key
      *
      * @return array|string
-     * @throws Exception
      */
     public static function Get($section='', $key='')
     {
-        if(!isset(self::$data))
-        {
-            try { self::init(); }
-            catch (Exception $e) { throw $e; }
-        }
         if($section==='') return self::$data;
         if($section && $key) return self::$data[$section][$key];
         return self::$data[$section];

@@ -15,13 +15,14 @@ class rester
     const path_module = 'modules';
     const file_config = 'config.ini';
 
-    protected static $request_param = array();
+    protected static $request_param = [];
     protected static $response_body = null;
     protected static $response_code = 200;
 
     protected static $success = true;
-    protected static $msg = array();
-    protected static $warning = array();
+    protected static $msg = [];
+    protected static $warning = [];
+    protected static $error = [];
 
     protected static $cfg = [];
     protected static $check_auth = false;
@@ -163,6 +164,94 @@ class rester
     }
 
     /**
+     * @param string $module
+     * @param string $proc
+     * @param array  $query
+     *
+     * @return mixed
+     */
+    public static function call_module($module, $proc, $query=[])
+    {
+        $old_module = cfg::change_module($module);
+        $old_proc = cfg::change_proc($proc);
+
+        $res = false;
+        if($path = self::path_proc())
+        {
+            $res = include $path;
+        }
+        else
+        {
+            self::failure();
+            self::msg("Can not found module: {$module}");
+        }
+
+        cfg::change_proc($old_proc);
+        cfg::change_module($old_module);
+        return $res;
+    }
+
+    /**
+     * @param string $proc
+     * @param array  $query
+     *
+     * @return mixed
+     */
+    public static function call_proc($proc, $query=[])
+    {
+        $old_proc = cfg::change_proc($proc);
+
+        $res = false;
+        if($path = self::path_proc())
+        {
+            $res = include $path;
+        }
+        else
+        {
+            self::failure();
+            self::msg("Can not found procedure: {$proc}");
+        }
+
+        cfg::change_proc($old_proc);
+        return $res;
+    }
+
+
+    /**
+     * @param string $proc
+     * @param array $query
+     * @return string|bool
+     */
+    public static function url_proc($proc, $query=[])
+    {
+        if(!$proc) return false;
+        $http_host = cfg::Get('default','http_host');
+        $module = cfg::module();
+        $_query = [];
+        foreach ($query as $k=>$v) { $_query[] = $k.'='.$v; }
+        $_query = trim(implode('&',$_query));
+        $_query = $_query?'?'.$_query:'';
+        return  $http_host."/v1/{$module}/{$proc}{$_query}";
+    }
+
+    /**
+     * @param string $module
+     * @param string $proc
+     * @param array $query
+     * @return bool|string
+     */
+    public static function url_module($module, $proc, $query=[])
+    {
+        if(!$module || !$proc) return false;
+        $http_host = cfg::Get('default','http_host');
+        $_query = [];
+        foreach ($query as $k=>$v) { $_query[] = $k.'='.$v; }
+        $_query = trim(implode('&',$_query));
+        $_query = $_query?'?'.$_query:'';
+        return  $http_host."/v1/{$module}/{$proc}{$_query}";
+    }
+
+    /**
      * Path module
      *
      * @return string
@@ -173,7 +262,6 @@ class rester
      * Path to procedure file
      *
      * @return bool|string
-     * @throws Exception
      */
     protected static function path_proc()
     {

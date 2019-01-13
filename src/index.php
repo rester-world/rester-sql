@@ -1,10 +1,12 @@
 <?php
 
+use rester\sql\cfg;
 use rester\sql\rester;
 
 $response_body = array(
     'success'=>false,
     'msg'=>'',
+    'error'=>[],
     'warning'=>[],
     'data'=>''
 );
@@ -13,6 +15,7 @@ $response_body = array(
 try
 {
     require_once './rester/common.php';
+    cfg::init();
     $response_body['data'] = rester::run();
     $response_body['msg'] = implode(',', rester::msg());
     $response_body['warning'] = rester::warning();
