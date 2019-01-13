@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/rester.class.php';
 //=============================================================================
 set_exception_handler(function($e) {
     rester::failure();
-    rester::msg($e);
+    rester::error($e);
 });
 
 
@@ -37,7 +37,7 @@ try {
         error_reporting(0);
 } catch (Exception $e) {
     rester::failure();
-    rester::msg($e->getMessage());
+    rester::error($e->getMessage());
 }
 
 //=============================================================================
@@ -48,7 +48,7 @@ try {
     date_default_timezone_set(cfg::Get('default', 'timezone'));
 } catch (Exception $e) {
     rester::failure();
-    rester::msg($e->getMessage());
+    rester::error($e->getMessage());
 }
 
 //=============================================================================

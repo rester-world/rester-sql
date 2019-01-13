@@ -175,6 +175,17 @@ class rester
         $old_module = cfg::change_module($module);
         $old_proc = cfg::change_proc($proc);
 
+        try
+        {
+            $_POST = $query;
+            cfg::init_body();
+        }
+        catch (Exception $e)
+        {
+            self::failure();
+            self::error($e->getMessage());
+        }
+
         $res = false;
         if($path = self::path_proc())
         {
@@ -183,7 +194,7 @@ class rester
         else
         {
             self::failure();
-            self::msg("Can not found module: {$module}");
+            self::error("Can not found module: {$module}");
         }
 
         cfg::change_proc($old_proc);
@@ -201,6 +212,17 @@ class rester
     {
         $old_proc = cfg::change_proc($proc);
 
+        try
+        {
+            $_POST = $query;
+            cfg::init_body();
+        }
+        catch (Exception $e)
+        {
+            self::failure();
+            self::error($e->getMessage());
+        }
+
         $res = false;
         if($path = self::path_proc())
         {
@@ -209,7 +231,7 @@ class rester
         else
         {
             self::failure();
-            self::msg("Can not found procedure: {$proc}");
+            self::error("Can not found procedure: {$proc}");
         }
 
         cfg::change_proc($old_proc);
@@ -417,6 +439,21 @@ class rester
     {
         if($msg===null) return self::$warning;
         else self::$warning[] = $msg;
+        return null;
+    }
+
+
+    /**
+     * Add error
+     *
+     * @param null|string $msg
+     *
+     * @return array
+     */
+    public static function error($msg=null)
+    {
+        if($msg===null) return self::$error;
+        else self::$error[] = $msg;
         return null;
     }
 

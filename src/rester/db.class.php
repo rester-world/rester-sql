@@ -46,7 +46,7 @@ class db
         catch (Exception $e)
         {
             rester::failure();
-            rester::msg($e->getMessage());
+            rester::error($e->getMessage());
             return false;
         }
     }

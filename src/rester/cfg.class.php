@@ -81,6 +81,31 @@ class cfg
     public static function cache() { return self::Get('cache'); }
 
     /**
+     * extract body
+     */
+    public static function init_body()
+    {
+        // Extract request parameter
+        // Json, POST, GET
+        self::$data['request-body'] = array();
+        if($body = json_decode(file_get_contents('php://input'),true))
+        {
+            self::$data['request-body'] = $body;
+        }
+        else
+        {
+            self::$data['request-body'] = $_POST;
+            unset($_POST);
+        }
+
+        foreach ($_GET as $k=>$v)
+        {
+            if(!isset(self::$data['request-body'][$k])) self::$data['request-body'][$k] = $v;
+        }
+        unset($_GET);
+    }
+
+    /**
      * Initialize default config
      *
      * @throws Exception
@@ -152,27 +177,9 @@ class cfg
             if(!is_array($cfg['access_control']['allows_origin'])) $cfg['access_control']['allows_origin'] = array($cfg['access_control']['allows_origin']);
             if(!in_array($access_ip,$cfg['access_control']['allows_origin'])) throw new Exception("Access denied.(Not allowed ip address:{$access_ip})");
         }
-
-        // Extract request parameter
-        // Json, POST, GET
-        $cfg['request-body'] = array();
-        if($body = json_decode(file_get_contents('php://input'),true))
-        {
-            $cfg['request-body'] = $body;
-        }
-        else
-        {
-            $cfg['request-body'] = $_POST;
-            unset($_POST);
-        }
-
-        foreach ($_GET as $k=>$v)
-        {
-            if(!isset($cfg['request-body'][$k])) $cfg['request-body'][$k] = $v;
-        }
-        unset($_GET);
-
         self::$data = $cfg;
+
+        self::init_body();
     }
 
     /**
