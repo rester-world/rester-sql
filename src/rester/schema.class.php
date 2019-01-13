@@ -60,8 +60,7 @@ class schema
      */
     protected function set_schema_file_json($file_path)
     {
-        try { $this->set_schema(json_decode(file_get_contents($file_path),true)); }
-        catch (Exception$e) { throw $e; }
+        $this->set_schema(json_decode(file_get_contents($file_path),true));
     }
 
     /**
@@ -73,8 +72,7 @@ class schema
      */
     protected function set_schema_file_ini($file_path)
     {
-        try { $this->set_schema(parse_ini_file($file_path,true, INI_SCANNER_RAW)); }
-        catch (Exception$e) { throw $e; }
+        $this->set_schema(parse_ini_file($file_path,true, INI_SCANNER_RAW));
     }
 
     /**

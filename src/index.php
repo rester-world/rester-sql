@@ -18,12 +18,13 @@ try
     cfg::init();
     $response_body['data'] = rester::run();
     $response_body['msg'] = implode(',', rester::msg());
+    $response_body['error'] = rester::error();
     $response_body['warning'] = rester::warning();
     if(rester::isSuccess()) $response_body['success'] = true;
 }
 catch (Exception $e)
 {
-    $response_body['msg'] = $e->getMessage();
+    $response_body['error'] = $e->getMessage();
 }
 
 // print response code & response header
