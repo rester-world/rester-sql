@@ -139,10 +139,17 @@ class rester
         {
             if($path_sql)
             {
+                // 필터링 된 파라미터를 받아옴
+                $params = [];
+                foreach (cfg::parameter() as $k=>$v) $params[$k] = self::param($k);
+
                 $pdo = db::get();
                 $query = file_get_contents($path_sql);
+                $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
+                $stmt->execute($params);
+                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $response_data = [];
-                foreach($pdo->query($query,PDO::FETCH_ASSOC) as $row)
+                foreach($res as $row)
                 {
                     $response_data[] = $row;
                 }

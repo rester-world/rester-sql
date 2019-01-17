@@ -37,9 +37,10 @@ class db
                 if(!$cfg['password']) throw new Exception("There is no {$config_name}['password'] database setting.");
                 if(!$cfg['database']) throw new Exception("There is no {$config_name}['database'] database setting.");
 
-                    $dsn = self::create_dsn($cfg);
-                    self::$inst[$config_name] = new PDO($dsn, $cfg['user'], $cfg['password']);
-                    self::$inst[$config_name]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $dsn = self::create_dsn($cfg);
+                self::$inst[$config_name] = new PDO($dsn, $cfg['user'], $cfg['password']);
+                self::$inst[$config_name]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$inst[$config_name]->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
             }
             return self::$inst[$config_name];
         }
