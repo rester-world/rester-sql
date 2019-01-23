@@ -387,7 +387,7 @@ class schema
     protected function validate_json($data)
     {
         $ret = false;
-        if(@json_decode($data,true)) $ret = $data;
+        if(@json_decode(stripslashes($data),true)) $ret = $data;
         return $ret;
     }
 
