@@ -40,6 +40,23 @@ class rester
     }
 
     /**
+     * verify request parameter
+     * check body | query string
+     *
+     * @throws Exception
+     */
+    protected static function check_parameter()
+    {
+        if($path_verify = self::path_verify())
+        {
+            self::reset_parameter();
+            $schema = new schema($path_verify);
+            if($data = $schema->validate(cfg::parameter()))
+                foreach($data as $k => $v) rester::set_request_param($k, $v);
+        }
+    }
+
+    /**
      * run rester
      *
      * @throws Exception
@@ -64,11 +81,11 @@ class rester
         //=====================================================================
         /// check cache option and auth option
         //=====================================================================
-        if(self::cfg('auth',cfg::proc())) self::$check_auth = true;
-        if(self::cfg('cache',cfg::proc()))
+        if(self::cfg('auth',$proc)) self::$check_auth = true;
+        if(self::cfg('cache',$proc))
         {
             self::$use_cache = true;
-            self::$cache_timeout = self::cfg('cache',cfg::proc());
+            self::$cache_timeout = self::cfg('cache',$proc);
         }
 
         //=====================================================================
@@ -86,15 +103,8 @@ class rester
         if($path_verify = self::path_verify())
         {
             $schema = new schema($path_verify);
-            try
-            {
-                if($data = $schema->validate(cfg::parameter()))
-                    foreach($data as $k => $v) rester::set_request_param($k, $v);
-            }
-            catch (Exception $e)
-            {
-                throw new Exception("request-body | query: ".$e->getMessage());
-            }
+            if($data = $schema->validate(cfg::parameter()))
+                foreach($data as $k => $v) rester::set_request_param($k, $v);
         }
 
 
@@ -139,20 +149,7 @@ class rester
         {
             if($path_sql)
             {
-                // 필터링 된 파라미터를 받아옴
-                $params = [];
-                foreach (cfg::parameter() as $k=>$v) $params[$k] = self::param($k);
-
-                $pdo = db::get();
-                $query = file_get_contents($path_sql);
-                $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
-                $stmt->execute($params);
-                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $response_data = [];
-                foreach($res as $row)
-                {
-                    $response_data[] = $row;
-                }
+                $response_data = self::execute_sql($path_sql);
             }
             elseif($path_proc)
             {
@@ -171,6 +168,31 @@ class rester
     }
 
     /**
+     * @param string $path
+     *
+     * @return array
+     * @throws Exception
+     */
+    public static function execute_sql($path)
+    {
+        // 필터링 된 파라미터를 받아옴
+        $params = [];
+        foreach (cfg::parameter() as $k=>$v) $params[$k] = self::param($k);
+
+        $pdo = db::get();
+        $query = file_get_contents($path);
+        $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
+        $stmt->execute($params);
+        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $response_data = [];
+        foreach($res as $row)
+        {
+            $response_data[] = $row;
+        }
+        return $response_data;
+    }
+
+    /**
      * @param string $module
      * @param string $proc
      * @param array  $query
@@ -182,10 +204,30 @@ class rester
         $old_module = cfg::change_module($module);
         $old_proc = cfg::change_proc($proc);
 
+        $res = false;
         try
         {
             $_POST = $query;
-            cfg::init_body();
+            unset($query);
+            cfg::init_parameter();
+            self::check_parameter();
+
+            $path_sql = self::path_sql();
+            $path_proc = self::path_proc();
+
+            if($path_sql)
+            {
+                $res= self::execute_sql($path_sql);
+            }
+            elseif($path_proc)
+            {
+                $res= include $path_proc;
+            }
+            else
+            {
+                self::failure();
+                self::error("Can not found module: {$module}");
+            }
         }
         catch (Exception $e)
         {
@@ -193,16 +235,6 @@ class rester
             self::error($e->getMessage());
         }
 
-        $res = false;
-        if($path = self::path_proc())
-        {
-            $res = include $path;
-        }
-        else
-        {
-            self::failure();
-            self::error("Can not found module: {$module}");
-        }
 
         cfg::change_proc($old_proc);
         cfg::change_module($old_module);
@@ -219,26 +251,36 @@ class rester
     {
         $old_proc = cfg::change_proc($proc);
 
+        $res = false;
+
         try
         {
             $_POST = $query;
-            cfg::init_body();
+            unset($query);
+            cfg::init_parameter();
+            self::check_parameter();
+
+            $path_sql = self::path_sql();
+            $path_proc = self::path_proc();
+
+            if($path_sql)
+            {
+                $res= self::execute_sql($path_sql);
+            }
+            elseif($path_proc)
+            {
+                $res= include $path_proc;
+            }
+            else
+            {
+                self::failure();
+                self::error("Can not found procedure: {$proc}");
+            }
         }
         catch (Exception $e)
         {
             self::failure();
             self::error($e->getMessage());
-        }
-
-        $res = false;
-        if($path = self::path_proc())
-        {
-            $res = include $path;
-        }
-        else
-        {
-            self::failure();
-            self::error("Can not found procedure: {$proc}");
         }
 
         cfg::change_proc($old_proc);
@@ -389,6 +431,7 @@ class rester
      * @param string $value
      */
     public static function set_request_param($key, $value) { self::$request_param[$key] = $value; }
+    public static function reset_parameter() { self::$request_param = []; }
 
     /**
      * return analyzed parameter
