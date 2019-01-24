@@ -5,7 +5,7 @@ use rester\sql\rester;
 
 $response_body = array(
     'success'=>false,
-    'msg'=>'',
+    'msg'=>[],
     'error'=>[],
     'warning'=>[],
     'data'=>''
@@ -24,7 +24,8 @@ try
 }
 catch (Exception $e)
 {
-    $response_body['error'] = $e->getMessage();
+    $response_body['error']['msg'] = $e->getMessage();
+    $response_body['error']['trace'] = explode("\n",$e->getTraceAsString());
 }
 
 // print response code & response header

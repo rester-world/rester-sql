@@ -30,26 +30,16 @@ set_exception_handler(function($e) {
 //=============================================================================
 /// 오류출력설정
 //=============================================================================
-try {
-    if (cfg::Get('default', 'debug_mode'))
-        error_reporting(E_ALL ^ (E_NOTICE | E_STRICT | E_WARNING | E_DEPRECATED));
-    else
-        error_reporting(0);
-} catch (Exception $e) {
-    rester::failure();
-    rester::error($e->getMessage());
-}
+if (cfg::Get('default', 'debug_mode'))
+    error_reporting(E_ALL ^ (E_NOTICE | E_STRICT | E_WARNING | E_DEPRECATED));
+else
+    error_reporting(0);
 
 //=============================================================================
 /// timezone 설정
 /// rester.ini
 //=============================================================================
-try {
-    date_default_timezone_set(cfg::Get('default', 'timezone'));
-} catch (Exception $e) {
-    rester::failure();
-    rester::error($e->getMessage());
-}
+date_default_timezone_set(cfg::Get('default', 'timezone'));
 
 //=============================================================================
 /// Set the global variables [_POST / _GET / _COOKIE]
