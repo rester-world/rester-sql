@@ -406,6 +406,16 @@ class schema
      *
      * @return string
      */
+    protected function validate_email($data)
+    {
+        return filter_var($data,FILTER_VALIDATE_EMAIL);
+    }
+
+    /**
+     * @param $data
+     *
+     * @return string
+     */
     protected function validate_html($data)
     {
         return $data;
