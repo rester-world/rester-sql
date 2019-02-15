@@ -13,7 +13,15 @@ use Redis;
 class rester
 {
     const path_module = 'modules';
-    const file_config = 'config.ini';
+
+    const cfg_file_name = 'config.ini';
+
+    const cfg_common = 'common';
+    const cfg_common_database = 'database';
+    const cfg_common_database_default = 'default';
+
+    const cfg_auth = 'auth';
+    const cfg_cache = 'cache';
 
     protected static $request_param = [];
     protected static $response_body = null;
@@ -25,6 +33,11 @@ class rester
     protected static $error = [];
 
     protected static $cfg = [];
+    protected static $cfg_default = [
+        self::cfg_common=>[
+            self::cfg_common_database=>self::cfg_common_database_default
+        ]
+    ];
     protected static $check_auth = false;
     protected static $use_cache = false;
     protected static $cache_timeout;
@@ -57,6 +70,32 @@ class rester
     }
 
     /**
+     * @throws Exception
+     */
+    protected static function init_config()
+    {
+        $cfg = array();
+        if($path = self::path_cfg())
+        {
+            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
+        }
+
+        // set default value
+        foreach(self::$cfg_default as $k=>$values)
+        {
+            foreach($values as $kk=>$value)
+            {
+                if(!isset($cfg[$k][$kk]))
+                {
+                    $cfg[$k][$kk] = $value;
+                }
+            }
+        }
+        self::$cfg = $cfg;
+
+    }
+
+    /**
      * run rester
      *
      * @throws Exception
@@ -69,23 +108,18 @@ class rester
         //=====================================================================
         /// include config.ini
         /// Must included first!
-        /// Use another function.
+        /// Because to use another function.
         //=====================================================================
-        $cfg = array();
-        if($path = self::path_cfg())
-        {
-            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
-        }
-        self::$cfg = $cfg;
+        self::init_config();
 
         //=====================================================================
         /// check cache option and auth option
         //=====================================================================
-        if(self::cfg('auth',$proc)) self::$check_auth = true;
-        if(self::cfg('cache',$proc))
+        if(self::cfg(self::cfg_auth,$proc)) self::$check_auth = true;
+        if(self::cfg(self::cfg_cache,$proc))
         {
             self::$use_cache = true;
-            self::$cache_timeout = self::cfg('cache',$proc);
+            self::$cache_timeout = self::cfg(self::cfg_cache,$proc);
         }
 
         //=====================================================================
@@ -179,7 +213,7 @@ class rester
         $params = [];
         foreach (cfg::parameter() as $k=>$v) $params[$k] = self::param($k);
 
-        $pdo = db::get();
+        $pdo = self::db_instance();
         $query = file_get_contents($path);
         $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
         $stmt->execute($params);
@@ -193,6 +227,16 @@ class rester
     }
 
     /**
+     * @return bool|PDO
+     */
+    public static function db_instance()
+    {
+        $dbname = self::cfg(self::cfg_common,self::cfg_common_database);
+        if(!$dbname) $dbname = self::cfg_common_database_default;
+        return db::get($dbname);
+    }
+
+    /**
      * @param string $module
      * @param string $proc
      * @param array  $query
@@ -203,6 +247,7 @@ class rester
     {
         $old_module = cfg::change_module($module);
         $old_proc = cfg::change_proc($proc);
+        $old_cfg = self::$cfg;
 
         $res = false;
         try
@@ -211,6 +256,7 @@ class rester
             unset($query);
             cfg::init_parameter();
             self::check_parameter();
+            self::init_config();
 
             $path_sql = self::path_sql();
             $path_proc = self::path_proc();
@@ -236,6 +282,7 @@ class rester
         }
 
 
+        self::$cfg = $old_cfg;
         cfg::change_proc($old_proc);
         cfg::change_module($old_module);
         return $res;
@@ -250,6 +297,7 @@ class rester
     public static function call_proc($proc, $query=[])
     {
         $old_proc = cfg::change_proc($proc);
+        $old_cfg = self::$cfg;
 
         $res = false;
 
@@ -259,6 +307,7 @@ class rester
             unset($query);
             cfg::init_parameter();
             self::check_parameter();
+            self::init_config();
 
             $path_sql = self::path_sql();
             $path_proc = self::path_proc();
@@ -283,6 +332,7 @@ class rester
             self::error($e->getMessage());
         }
 
+        self::$cfg = $old_cfg;
         cfg::change_proc($old_proc);
         return $res;
     }
@@ -375,7 +425,7 @@ class rester
         $path = implode('/',array(
             self::path_module(),
             cfg::module(),
-            self::file_config
+            self::cfg_file_name
         ));
 
         if(is_file($path)) return $path;
