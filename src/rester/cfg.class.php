@@ -198,10 +198,41 @@ class cfg
      *
      * @return array|string
      */
-    public static function Get($section='', $key='')
+    public static function get($section='', $key='')
     {
         if($section==='') return self::$data;
         if($section && $key) return self::$data[$section][$key];
         return self::$data[$section];
+    }
+
+    /**
+     * @param $section
+     * @param $key
+     * @param $value
+     */
+    public static function set($section, $key, $value)
+    {
+        self::$data[$section][$key] = $value;
+    }
+
+    /**
+     * @param $section
+     * @param $values
+     */
+    public static function set_section($section, $values)
+    {
+        self::$data[$section] = $values;
+    }
+
+    /**
+     * @param $name
+     * @param $info
+     */
+    public static function set_database_info($name, $info)
+    {
+        if($name && is_array($info))
+        {
+            self::$data['database'][$name] = $info;
+        }
     }
 }
