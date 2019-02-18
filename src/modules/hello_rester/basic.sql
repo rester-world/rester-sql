@@ -1,3 +1,2 @@
-<?php if(!defined('__RESTER__')) exit;
 
-return "Hello RESTer world!! This is rester-sql examples.";
+SELECT 'Hello RESTer world!! This is rester-sql examples.' as welcome
