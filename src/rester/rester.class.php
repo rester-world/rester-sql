@@ -209,12 +209,18 @@ class rester
      */
     public static function execute_sql($path)
     {
-        // 필터링 된 파라미터를 받아옴
-        $params = [];
-        foreach (cfg::parameter() as $k=>$v) $params[$k] = self::param($k);
-
         $pdo = self::db_instance();
         $query = file_get_contents($path);
+
+        // 필터링 된 파라미터를 받아옴
+        $params = [];
+        foreach (cfg::parameter() as $k=>$v)
+        {
+            // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
+            if(strpos($query, $k)!==false)
+                $params[$k] = self::param($k);
+        }
+
         $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
         $stmt->execute($params);
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
