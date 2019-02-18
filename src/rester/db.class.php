@@ -57,7 +57,7 @@ class db
                     $proc = $cfg[self::type_db_dynamic_proc];
                     if($module && $proc)
                     {
-                        $cfg = rester::call_module($module,$proc);
+                        $cfg = array_pop(rester::call_module($module,$proc,cfg::parameter()));
                     }
                     else
                     {
