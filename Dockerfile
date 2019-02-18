@@ -1,5 +1,5 @@
-FROM kevinpark/nginx-php-redis
-MAINTAINER Kevin Park<kevinpark@webace.co.kr>
+FROM rester/rester-docker
+MAINTAINER Woong-Gi Jeon<jeon.wbbi@gmail.com>
 
 RUN mkdir /var/www/cfg
 

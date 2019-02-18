@@ -27,14 +27,13 @@ services:
 
  rester-sql:
   container_name: rester-sql
-  image: kevinpark/nginx-php-redis
+  image: rester/rester-sql
   restart: always
   links:
     - redis:cache.rester.kr
     - db:db.rester.kr
   volumes:
-   - ./default.conf:/etc/nginx/sites-available/default.conf:ro
-   - ./src:/var/www/html
-   - ./cfg:/var/www/cfg:ro
+    - ./src/modules:/var/www/html/modules:ro
+    - ./cfg:/var/www/cfg:ro
   ports:
   - '80:80'

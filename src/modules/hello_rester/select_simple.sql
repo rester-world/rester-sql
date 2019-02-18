@@ -1,3 +1,3 @@
 SELECT *
 FROM `example`
-LIMIT 10
+LIMIT :start, :rows
