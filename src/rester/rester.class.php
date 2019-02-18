@@ -141,7 +141,6 @@ class rester
                 foreach($data as $k => $v) rester::set_request_param($k, $v);
         }
 
-
         //=====================================================================
         /// check files
         //=====================================================================
@@ -214,11 +213,11 @@ class rester
 
         // 필터링 된 파라미터를 받아옴
         $params = [];
-        foreach (cfg::parameter() as $k=>$v)
+        foreach (self::param() as $k=>$v)
         {
             // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
             if(strpos($query, $k)!==false)
-                $params[$k] = self::param($k);
+                $params[$k] = $v;
         }
 
         $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
