@@ -23,6 +23,12 @@ class rester
     const cfg_auth = 'auth';
     const cfg_cache = 'cache';
 
+    const cfg_access = 'access';
+    const cfg_access_default = 'default';
+    const cfg_access_private = 'private';
+    const cfg_access_internal = 'internal';
+    const cfg_access_public = 'public';
+
     protected static $request_param = [];
     protected static $response_body = null;
     protected static $response_code = 200;
@@ -96,6 +102,19 @@ class rester
     }
 
     /**
+     * @param string $procedure_name
+     *
+     * @return array|string
+     */
+    protected static function get_access_level($procedure_name)
+    {
+        $access_level = self::cfg(self::cfg_access,$procedure_name);
+        if(!$access_level) $access_level = self::cfg(self::cfg_access, self::cfg_access_default);
+        if(!$access_level) $access_level = self::cfg_access_public;
+        return $access_level;
+    }
+
+    /**
      * run rester
      *
      * @throws Exception
@@ -121,6 +140,13 @@ class rester
             self::$use_cache = true;
             self::$cache_timeout = self::cfg(self::cfg_cache,$proc);
         }
+
+        //---------------------------------------------------------------------
+        /// check access level
+        //---------------------------------------------------------------------
+        $access_level = self::get_access_level($proc);
+        if($access_level != self::cfg_access_public)
+            throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
 
         //=====================================================================
         /// include verify function
@@ -262,6 +288,11 @@ class rester
             cfg::init_parameter();
             self::check_parameter();
             self::init_config();
+
+            // check access level
+            $access_level = self::get_access_level($proc);
+            if($module!=$old_module && $access_level==self::cfg_access_private)
+                throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
 
             $path_sql = self::path_sql();
             $path_proc = self::path_proc();

@@ -1,4 +1,5 @@
 SELECT *
 FROM `example`
-LIMIT 10
+WHERE `key`=:key
+LIMIT 1
 
