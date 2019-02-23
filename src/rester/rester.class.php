@@ -6,56 +6,149 @@ use Redis;
 
 /**
  * Class rester
- * kevinpark@webace.co.kr
  *
- * 기본 핵심 모듈
- *
- * cfg
- * pdo
- * module
- * proc
- * path
+ * @package rester\sql
  */
 class rester
 {
     const path_module = 'modules';
 
-    protected static $response_body = null;
-    protected static $response_code = 200;
-
-    protected static $success = true;
-    protected static $msg = [];
-    protected static $warning = [];
-    protected static $error = [];
-
     /**
      * @var rester_config
      */
-    protected static $cfg;
+    protected $cfg;
 
     /**
      * @var rester_verify
      */
-    protected static $verify;
-
-    protected static $pdo;
-    protected static $path;
-    protected static $module;
-    protected static $proc;
-    protected static $redis;
-
-    protected static $check_auth = false;
-    protected static $use_cache = false;
-    protected static $cache_timeout;
+    protected $verify;
 
     /**
-     * execute header();
+     * @var string
      */
-    public static function run_headers()
+    protected $module;
+
+    /**
+     * @var string
+     */
+    protected $proc;
+
+    /**
+     * @var string
+     */
+    protected $path_proc;
+
+    /**
+     * @var string
+     */
+    protected $path_proc_sql;
+
+    /**
+     * @var Redis
+     */
+    protected $redis;
+
+    /**
+     * @var bool
+     */
+    protected $check_auth;
+
+    /**
+     * @var bool | int
+     */
+    protected $cache_timeout;
+
+    /**
+     * @var string
+     */
+    protected $cache_key;
+
+    /**
+     * @var bool 외부접근 여부
+     */
+    protected $is_public_access;
+
+    /**
+     * rester constructor.
+     *
+     * @param string $module
+     * @param string $proc
+     * @param array  $request_data
+     *
+     * @throws Exception
+     */
+    public function __construct($module, $proc, $request_data=[])
     {
-        // 응답 결과 코드 설정
-        http_response_code(self::$response_code);
-        header("Content-type: application/json; charset=UTF-8");
+        $this->is_public_access = false;
+        $this->module = $module;
+        $this->proc = $proc;
+
+        $base_path = dirname(__FILE__).'/../'.self::path_module;
+
+        // sql 프로시저 경로 설정
+        $this->path_proc_sql = false;
+        $path = implode('/',array( $base_path, $module, $proc.'.sql' ));
+        if(is_file($path))
+        {
+            $this->path_proc_sql = $path;
+        }
+
+        // 프로시저 경로 설정
+        $this->path_proc = false;
+        $path = implode('/',array( $base_path, $module, $proc.'.php' ));
+        if(is_file($path))
+        {
+            $this->path_proc = $path;
+        }
+
+        // 프로시저 파일 체크
+        if(!$this->path_proc_sql && !$this->path_proc)
+        {
+            throw new Exception("Not found procedure. Module: {$module}, Procedure: {$proc} ");
+        }
+
+        // create config
+        $this->cfg = new rester_config($module);
+
+        // create verify
+        $this->verify = new rester_verify($module, $proc);
+        $this->verify->validate($request_data);
+
+        // check auth
+        $this->check_auth = false;
+        $this->cfg->is_auth($proc);
+
+        // check cache
+        $this->cache_timeout = false;
+        $this->cfg->is_cache($proc);
+
+        // set redis
+        $this->redis = false;
+        if($this->cache_timeout)
+        {
+            $redis_cfg = cfg::cache();
+            if(!($redis_cfg['host'] && $redis_cfg['port']))
+                throw new Exception("Require cache config to use cache.");
+
+            $this->redis = new Redis();
+            $this->redis->connect($redis_cfg['host'], $redis_cfg['port']);
+            if($redis_cfg['auth']) $this->redis->auth($redis_cfg['auth']);
+
+            $this->cache_key = implode('_', array_merge(array($module,$proc),$this->verify->param()));
+        }
+    }
+
+    public function __destruct()
+    {
+        if($this->redis) $this->redis->close();
+    }
+
+    /**
+     * 외부접근 상태로 설정
+     */
+    public function set_public_access()
+    {
+        $this->is_public_access = true;
     }
 
     /**
@@ -63,89 +156,45 @@ class rester
      *
      * @throws Exception
      */
-    public static function run()
+    public function run()
     {
-        $module = cfg::module();
-        $proc = cfg::proc();
-
-        //=====================================================================
-        /// include config.ini
-        /// Must included first!
-        /// Because to use another function.
-        //=====================================================================
-        self::$cfg = new rester_config($module);
-        self::$verify = new rester_verify($module, $proc);
-        self::$verify->validate(cfg::parameter());
-
-        //=====================================================================
-        /// check cache option and auth option
-        //=====================================================================
-        self::$check_auth = self::$cfg->is_auth($proc);
-        self::$cache_timeout = self::$cfg->is_cache($proc);
-
-        //---------------------------------------------------------------------
-        /// check access level
-        //---------------------------------------------------------------------
-        $access_level = self::$cfg->access_level($proc);
-        if($access_level != rester_config::access_public)
-            throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
-
-
-        //=====================================================================
-        /// check files
-        //=====================================================================
-        $path_sql = self::path_sql();
-        $path_proc = self::path_proc();
-        if(false === $path_proc && false === $path_sql)
+        // check access level [public]
+        if($this->is_public_access)
         {
-            throw new Exception("Not found procedure. Module: {$module}, Procedure: {$proc} ");
+            $access_level = $this->cfg->access_level($this->proc);
+            if($access_level != rester_config::access_public)
+                throw new Exception("Can not access procedure. [Module] {$this->module}, [Procedure] {$this->proc}, [Access level] {$access_level} ");
         }
 
-        //=====================================================================
-        /// check auth
-        //=====================================================================
-        if(self::$check_auth) { session::get(cfg::token()); }
+        // check auth
+        if($this->check_auth) { session::get(cfg::token()); }
 
-        //=====================================================================
-        /// check cache
-        //=====================================================================
-        $redis_cfg = cfg::cache();
-        if(self::$use_cache && !($redis_cfg['host'] && $redis_cfg['port']))
-            throw new Exception("Require cache config to use cache.");
+        $response_data = false;
 
-        $response_data = null;
-        $redis = new Redis();
-        $cache_key = implode('_', array_merge(array($module,$proc),self::param()));
-        if(self::$use_cache)
+        // get cached data
+        if($this->cache_timeout)
         {
-            $redis->connect($redis_cfg['host'], $redis_cfg['port']);
-            if($redis_cfg['auth']) $redis->auth($redis_cfg['auth']);
-            // get cached data
-            $response_data = json_decode($redis->get($cache_key),true);
+            $response_data = json_decode($this->redis->get($this->cache_key),true);
         }
 
-        //=====================================================================
-        /// include procedure
-        //=====================================================================
+        // include procedure
         if(!$response_data)
         {
-            if($path_sql)
+            if($this->path_proc_sql)
             {
-                $response_data = self::execute_sql($path_sql);
+                $response_data = $this->execute_sql($this->path_proc_sql);
             }
-            elseif($path_proc)
+            elseif($this->path_proc)
             {
-                $response_data = include $path_proc;
+                $response_data = include $this->path_proc;
+            }
+
+            // cached body
+            if($this->cache_timeout)
+            {
+                $this->redis->set($this->cache_key,json_encode($response_data),$this->cache_timeout);
             }
         }
-
-        // cached body
-        if(self::$use_cache && !$redis->get($cache_key)) { $redis->set($cache_key,json_encode($response_data),self::$cache_timeout); }
-
-        // close redis
-        if(self::$use_cache) { $redis->close(); }
-
-        // 저장된 $body 출력
         return $response_data;
     }
 
@@ -155,14 +204,14 @@ class rester
      * @return array
      * @throws Exception
      */
-    public static function execute_sql($path)
+    public function execute_sql($path)
     {
-        $pdo = self::db_instance();
+        $pdo = db::get($this->cfg->database());
         $query = file_get_contents($path);
 
         // 필터링 된 파라미터를 받아옴
         $params = [];
-        foreach (self::param() as $k=>$v)
+        foreach ($this->verify->param() as $k=>$v)
         {
             // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
             if(strpos($query, $k)!==false)
@@ -177,7 +226,6 @@ class rester
                 throw new Exception("There is no parameter for bind. [{$match}]");
         }
 
-
         $response_data = [];
         $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
         $stmt->execute($params);
@@ -189,264 +237,4 @@ class rester
 
         return $response_data;
     }
-
-    /**
-     * @return bool|PDO
-     */
-    public static function db_instance()
-    {
-        return db::get(self::$cfg->database());
-    }
-
-    /**
-     * @param string $module
-     * @param string $proc
-     * @param array  $query
-     *
-     * @return mixed
-     */
-    public static function call_module($module, $proc, $query=[])
-    {
-        $old_module = cfg::change_module($module);
-        $old_proc = cfg::change_proc($proc);
-        $old_cfg = self::$cfg;
-
-        $res = false;
-        try
-        {
-            $_POST = $query;
-            unset($query);
-            cfg::init_parameter();
-            //self::check_parameter();
-            //self::init_config();
-
-            // check access level
-//            $access_level = self::get_access_level($proc);
-//            if($module!=$old_module && $access_level==self::cfg_access_private)
-//                throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
-
-            $path_sql = self::path_sql();
-            $path_proc = self::path_proc();
-
-            if($path_sql)
-            {
-                $res= self::execute_sql($path_sql);
-            }
-            elseif($path_proc)
-            {
-                $res= include $path_proc;
-            }
-            else
-            {
-                self::failure();
-                self::error("Can not found module: {$module}");
-            }
-        }
-        catch (Exception $e)
-        {
-            self::failure();
-            self::error($e->getMessage());
-        }
-
-
-        self::$cfg = $old_cfg;
-        cfg::change_proc($old_proc);
-        cfg::change_module($old_module);
-        return $res;
-    }
-
-    /**
-     * @param string $proc
-     * @param array  $query
-     *
-     * @return mixed
-     */
-    public static function call_proc($proc, $query=[])
-    {
-        $old_proc = cfg::change_proc($proc);
-        $old_cfg = self::$cfg;
-
-        $res = false;
-
-        try
-        {
-            $_POST = $query;
-            unset($query);
-            cfg::init_parameter();
-            //self::check_parameter();
-//            self::init_config();
-
-            $path_sql = self::path_sql();
-            $path_proc = self::path_proc();
-
-            if($path_sql)
-            {
-                $res = self::execute_sql($path_sql);
-            }
-            elseif($path_proc)
-            {
-                $res = include $path_proc;
-            }
-            else
-            {
-                self::failure();
-                self::error("Can not found procedure: {$proc}");
-            }
-        }
-        catch (Exception $e)
-        {
-            self::failure();
-            self::error($e->getMessage());
-        }
-
-        self::$cfg = $old_cfg;
-        cfg::change_proc($old_proc);
-        return $res;
-    }
-
-
-    /**
-     * @param string $proc
-     * @param array $query
-     * @return string|bool
-     */
-    public static function url_proc($proc, $query=[])
-    {
-        if(!$proc) return false;
-        $http_host = cfg::Get('default','http_host');
-        $module = cfg::module();
-        $_query = [];
-        foreach ($query as $k=>$v) { $_query[] = $k.'='.$v; }
-        $_query = trim(implode('&',$_query));
-        $_query = $_query?'?'.$_query:'';
-        return  $http_host."/v1/{$module}/{$proc}{$_query}";
-    }
-
-    /**
-     * @param string $module
-     * @param string $proc
-     * @param array $query
-     * @return bool|string
-     */
-    public static function url_module($module, $proc, $query=[])
-    {
-        if(!$module || !$proc) return false;
-        $http_host = cfg::Get('default','http_host');
-        $_query = [];
-        foreach ($query as $k=>$v) { $_query[] = $k.'='.$v; }
-        $_query = trim(implode('&',$_query));
-        $_query = $_query?'?'.$_query:'';
-        return  $http_host."/v1/{$module}/{$proc}{$_query}";
-    }
-
-    /**
-     * Path module
-     *
-     * @return string
-     */
-    protected static function path_module() { return dirname(__FILE__).'/../'.self::path_module; }
-
-    /**
-     * Path to procedure file
-     *
-     * @return bool|string
-     */
-    protected static function path_proc()
-    {
-        $path = implode('/',array(
-            self::path_module(),
-            cfg::module(),
-            cfg::proc().'.php'
-        ));
-
-        if(is_file($path)) return $path;
-        return false;
-    }
-
-    /**
-     * Path to procedure file
-     *
-     * @return bool|string
-     * @throws Exception
-     */
-    protected static function path_sql()
-    {
-        $path = implode('/',array(
-            self::path_module(),
-            cfg::module(),
-            cfg::proc().'.sql'
-        ));
-
-        if(is_file($path)) return $path;
-        return false;
-    }
-
-    /**
-     * return analyzed parameter
-     *
-     * @param null|string $key
-     * @return bool|mixed
-     */
-    public static function param($key=null)
-    {
-        return self::$verify->param($key);
-    }
-
-    /**
-     * @param integer $code
-     */
-    public static function set_response_code($code) { self::$response_code = $code; }
-
-    /**
-     * Add message
-     *
-     * @param null|string $msg
-     *
-     * @return array
-     */
-    public static function msg($msg=null)
-    {
-        if($msg===null) return self::$msg;
-        else self::$msg[] = $msg;
-        return null;
-    }
-
-    /**
-     * Add warning message
-     *
-     * @param null|string $msg
-     *
-     * @return array
-     */
-    public static function warning($msg=null)
-    {
-        if($msg===null) return self::$warning;
-        else self::$warning[] = $msg;
-        return null;
-    }
-
-
-    /**
-     * Add error
-     *
-     * @param null|string $msg
-     *
-     * @return array
-     */
-    public static function error($msg=null)
-    {
-        if($msg===null) return self::$error;
-        else self::$error[] = $msg;
-        return null;
-    }
-
-    /**
-     * set failure
-     */
-    public static function failure() { self::$success = false; }
-
-    /**
-     * @return bool
-     */
-    public static function isSuccess() { return self::$success; }
 }

@@ -91,8 +91,7 @@ class session
         }
         catch (Exception $e)
         {
-            rester::failure();
-            rester::msg($e->getMessage());
+            rester_response::error($e->getMessage());
         }
         return false;
     }
