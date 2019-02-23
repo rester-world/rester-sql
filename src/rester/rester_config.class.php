@@ -35,11 +35,11 @@ class rester_config
             self::common_database=>self::common_database_default
         ]
     ];
-    protected $module;
 
-    protected $check_auth = false;
-    protected $use_cache = false;
-    protected $cache_timeout;
+    /**
+     * @var string
+     */
+    protected $module;
 
     /**
      * rester_config constructor.
@@ -97,7 +97,7 @@ class rester_config
      */
     public function database()
     {
-        return cfg::database($this->data[self::common][self::common_database]);
+        return $this->data[self::common][self::common_database];
     }
 
     /**
