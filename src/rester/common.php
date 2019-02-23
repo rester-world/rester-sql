@@ -5,16 +5,18 @@
  */
 
 use rester\sql\cfg;
-use rester\sql\rester;
+use rester\sql\rester_response;
 
 define('__RESTER__', TRUE);
 
 // -----------------------------------------------------------------------------
 /// include classes
 // -----------------------------------------------------------------------------
+require_once dirname(__FILE__).'/common.lib.php';
 require_once dirname(__FILE__).'/cfg.class.php';
 require_once dirname(__FILE__).'/db.class.php';
 require_once dirname(__FILE__).'/session.class.php';
+require_once dirname(__FILE__).'/rester_response.class.php';
 require_once dirname(__FILE__).'/rester_config.class.php';
 require_once dirname(__FILE__).'/rester_verify.class.php';
 require_once dirname(__FILE__).'/rester.class.php';
@@ -23,8 +25,7 @@ require_once dirname(__FILE__).'/rester.class.php';
 /// catch 되지 않은 예외에 대한 처리함수
 // -----------------------------------------------------------------------------
 set_exception_handler(function($e) {
-    rester::failure();
-    rester::error($e);
+    rester_response::error($e);
 });
 
 
@@ -91,4 +92,3 @@ if (get_magic_quotes_gpc())
 if(is_array($_POST)) array_walk_recursive($_POST, function(&$item){ $item = addslashes($item); });
 if(is_array($_GET)) array_walk_recursive($_GET, function(&$item){ $item = addslashes($item); });
 if(is_array($_COOKIE)) array_walk_recursive($_COOKIE, function(&$item){ $item = addslashes($item); });
-
