@@ -5,7 +5,8 @@ use PDO;
 
 /**
  * Class db
- * @author kevinpark@webace.co.kr
+ *
+ * @package rester\sql
  */
 class db
 {
@@ -32,7 +33,7 @@ class db
     /**
      * @var array 데이터베이스 인스턴스
      */
-    private static $inst = array();
+    private static $inst = [];
 
     /**
      * @param string $config_name
@@ -57,21 +58,22 @@ class db
                     $proc = $cfg[self::type_db_dynamic_proc];
                     if($module && $proc)
                     {
-                        $cfg = rester::call_module($module,$proc,cfg::parameter());
+                        $rester = new rester($module,$proc,cfg::parameter());
+                        $cfg = $rester->run();
                         if(!$cfg[self::cfk_host] && is_array($cfg[0])) $cfg = array_pop($cfg);
                     }
                     else
                     {
-                        throw new Exception("There is no {$config_name} database setting. (module,proc)");
+                        throw new Exception("There is no `{$config_name}` database setting. (module,proc)");
                     }
                 }
 
-                if(!$cfg) throw new Exception("There is no {$config_name} database setting.");
-                if(!$cfg[self::cfk_type]) throw new Exception("There is no {$config_name}['type'] database setting.");
-                if(!$cfg[self::cfk_host]) throw new Exception("There is no {$config_name}['host'] database setting.");
-                if(!$cfg[self::cfk_user]) throw new Exception("There is no {$config_name}['user'] database setting.");
-                if(!$cfg[self::cfk_password]) throw new Exception("There is no {$config_name}['password'] database setting.");
-                if(!$cfg[self::cfk_database]) throw new Exception("There is no {$config_name}['database'] database setting.");
+                if(!$cfg) throw new Exception("There is no `{$config_name}` database setting.");
+                if(!$cfg[self::cfk_type]) throw new Exception("There is no `{$config_name}['type']` database setting.");
+                if(!$cfg[self::cfk_host]) throw new Exception("There is no `{$config_name}['host']` database setting.");
+                if(!$cfg[self::cfk_user]) throw new Exception("There is no `{$config_name}['user']` database setting.");
+                if(!$cfg[self::cfk_password]) throw new Exception("There is no `{$config_name}['password']` database setting.");
+                if(!$cfg[self::cfk_database]) throw new Exception("There is no `{$config_name}['database']` database setting.");
 
                 $dsn = self::create_dsn($cfg);
                 self::$inst[$config_name] = new PDO($dsn, $cfg[self::cfk_user], $cfg[self::cfk_password]);
@@ -82,8 +84,7 @@ class db
         }
         catch (Exception $e)
         {
-            rester::failure();
-            rester::error($e->getMessage());
+            rester_response::error($e->getMessage());
             return false;
         }
     }
