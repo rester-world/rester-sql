@@ -237,4 +237,24 @@ class rester
 
         return $response_data;
     }
+
+    /**
+     * @param string $key
+     *
+     * @return bool|mixed
+     */
+    public function request_param($key)
+    {
+        return $this->verify->param($key);
+    }
+
+    /**
+     * @return string
+     */
+    public function module() { return $this->module; }
+
+    /**
+     * @return string
+     */
+    public function proc() { return $this->proc; }
 }
