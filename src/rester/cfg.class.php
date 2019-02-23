@@ -51,31 +51,10 @@ class cfg
     public static function module() { return self::Get('module'); }
 
     /**
-     * @param string $module
-     * @return string
-     */
-    public static function change_module($module)
-    {
-        $old = self::module();
-        self::$data['module'] = $module;
-        return $old;
-    }
-
-    /**
      * @return string
      */
     public static function proc() { return self::Get('proc'); }
 
-    /**
-     * @param string $proc
-     * @return string
-     */
-    public static function change_proc($proc)
-    {
-        $old = self::proc();
-        self::$data['proc'] = $proc;
-        return $old;
-    }
 
     /**
      * @return array
@@ -220,34 +199,4 @@ class cfg
         return self::$data[$section];
     }
 
-    /**
-     * @param $section
-     * @param $key
-     * @param $value
-     */
-    public static function set($section, $key, $value)
-    {
-        self::$data[$section][$key] = $value;
-    }
-
-    /**
-     * @param $section
-     * @param $values
-     */
-    public static function set_section($section, $values)
-    {
-        self::$data[$section] = $values;
-    }
-
-    /**
-     * @param $name
-     * @param $info
-     */
-    public static function set_database_info($name, $info)
-    {
-        if($name && is_array($info))
-        {
-            self::$data['database'][$name] = $info;
-        }
-    }
 }

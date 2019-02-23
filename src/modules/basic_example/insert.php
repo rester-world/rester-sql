@@ -1,18 +1,16 @@
-<?php
-if(!defined('__RESTER__')) exit;
+<?php if(!defined('__RESTER__')) exit;
 
-use rester\sql\rester;
+use rester\sql\rester_response;
 
-$key = rester::param('key');
-$value = rester::param('value');
-$old = array_pop(rester::call_proc('fetch_by_key',[':key'=>$key]));
+$key = request_param('key');
+$value = request_param('value');
+$old = array_pop(request_procedure('fetch_by_key',[':key'=>$key]));
 
 if($old['no'])
 {
-    rester::failure();
-    rester::msg('Already exists key!');
+    rester_response::error("Already exists key! [{$old['key']}]");
     return false;
 }
 
-rester::msg('Success!');
-return rester::call_proc('direct_insert',[':key'=>$key,':value'=>$value]);
+rester_response::msg('Success!');
+return request_procedure('direct_insert',[':key'=>$key,':value'=>$value]);
