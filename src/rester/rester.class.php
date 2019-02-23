@@ -20,7 +20,6 @@ class rester
 {
     const path_module = 'modules';
 
-    protected static $request_param = [];
     protected static $response_body = null;
     protected static $response_code = 200;
 
@@ -33,6 +32,11 @@ class rester
      * @var rester_config
      */
     protected static $cfg;
+
+    /**
+     * @var rester_verify
+     */
+    protected static $verify;
 
     protected static $pdo;
     protected static $path;
@@ -55,25 +59,6 @@ class rester
     }
 
     /**
-     * verify request parameter
-     * check body | query string
-     *
-     * @throws Exception
-     */
-    protected static function check_parameter()
-    {
-        if($path_verify = self::path_verify())
-        {
-            self::reset_parameter();
-            $schema = new schema($path_verify);
-            if($data = $schema->validate(cfg::parameter()))
-            {
-                foreach($data as $k => $v) rester::set_request_param($k, $v);
-            }
-        }
-    }
-
-    /**
      * run rester
      *
      * @throws Exception
@@ -88,7 +73,9 @@ class rester
         /// Must included first!
         /// Because to use another function.
         //=====================================================================
-        self::$cfg = new rester_config(cfg::module());
+        self::$cfg = new rester_config($module);
+        self::$verify = new rester_verify($module, $proc);
+        self::$verify->validate(cfg::parameter());
 
         //=====================================================================
         /// check cache option and auth option
@@ -103,19 +90,6 @@ class rester
         if($access_level != rester_config::access_public)
             throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
 
-        //=====================================================================
-        /// include verify function
-        //=====================================================================
-        if($path_verify_func = self::path_verify_func())
-        {
-            include $path_verify_func;
-        }
-
-        //=====================================================================
-        /// check request parameter
-        /// check body | query string
-        //=====================================================================
-        self::check_parameter();
 
         //=====================================================================
         /// check files
@@ -200,7 +174,7 @@ class rester
         foreach($matches[0] as $match)
         {
             if(!isset($params[$match]))
-                throw new Exception("There is no parmeter for bind. [{$match}]");
+                throw new Exception("There is no parameter for bind. [{$match}]");
         }
 
 
@@ -243,7 +217,7 @@ class rester
             $_POST = $query;
             unset($query);
             cfg::init_parameter();
-            self::check_parameter();
+            //self::check_parameter();
             //self::init_config();
 
             // check access level
@@ -299,7 +273,7 @@ class rester
             $_POST = $query;
             unset($query);
             cfg::init_parameter();
-            self::check_parameter();
+            //self::check_parameter();
 //            self::init_config();
 
             $path_sql = self::path_sql();
@@ -408,57 +382,6 @@ class rester
     }
 
     /**
-     * Path to verify file
-     *
-     * @return bool|string
-     * @throws Exception
-     */
-    protected static function path_verify()
-    {
-        $module_name = cfg::module();
-        $proc_name = cfg::proc();
-
-        $path = implode('/',array(
-            self::path_module(),
-            $module_name,
-            $proc_name.'.ini'
-        ));
-
-        if(is_file($path)) return $path;
-        return false;
-    }
-
-    /**
-     * Path to verify file
-     *
-     * @return bool|string
-     * @throws Exception
-     */
-    protected static function path_verify_func()
-    {
-        $module_name = cfg::module();
-        $proc_name = cfg::proc();
-
-        $path = implode('/',array(
-            self::path_module(),
-            $module_name,
-            $proc_name.'.verify.php'
-        ));
-
-        if(is_file($path)) return $path;
-        return false;
-    }
-
-    /**
-     * set request body
-     *
-     * @param string $key
-     * @param string $value
-     */
-    public static function set_request_param($key, $value) { self::$request_param[$key] = $value; }
-    public static function reset_parameter() { self::$request_param = []; }
-
-    /**
      * return analyzed parameter
      *
      * @param null|string $key
@@ -466,9 +389,7 @@ class rester
      */
     public static function param($key=null)
     {
-        if(isset(self::$request_param[$key])) return self::$request_param[$key];
-        if($key == null) return self::$request_param;
-        return false;
+        return self::$verify->param($key);
     }
 
     /**

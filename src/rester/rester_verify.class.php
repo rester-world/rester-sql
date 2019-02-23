@@ -79,10 +79,6 @@ class rester_verify
                 }
             }
         }
-        else
-        {
-            throw new Exception("There is no config file. Check the config file [{$path}]");
-        }
 
         // filter 검증
         foreach ($this->filter as $k=>$v)
