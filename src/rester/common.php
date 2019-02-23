@@ -14,7 +14,6 @@ define('__RESTER__', TRUE);
 // -----------------------------------------------------------------------------
 require_once dirname(__FILE__).'/cfg.class.php';
 require_once dirname(__FILE__).'/db.class.php';
-require_once dirname(__FILE__).'/schema.class.php';
 require_once dirname(__FILE__).'/session.class.php';
 require_once dirname(__FILE__).'/rester_config.class.php';
 require_once dirname(__FILE__).'/rester_verify.class.php';
