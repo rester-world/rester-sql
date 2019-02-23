@@ -5,47 +5,49 @@
  */
 
 use rester\sql\cfg;
-use rester\sql\rester;
+use rester\sql\rester_response;
 
 define('__RESTER__', TRUE);
 
-//=============================================================================
+// -----------------------------------------------------------------------------
 /// include classes
-//=============================================================================
+// -----------------------------------------------------------------------------
+require_once dirname(__FILE__).'/common.lib.php';
 require_once dirname(__FILE__).'/cfg.class.php';
 require_once dirname(__FILE__).'/db.class.php';
-require_once dirname(__FILE__).'/schema.class.php';
 require_once dirname(__FILE__).'/session.class.php';
+require_once dirname(__FILE__).'/rester_response.class.php';
+require_once dirname(__FILE__).'/rester_config.class.php';
+require_once dirname(__FILE__).'/rester_verify.class.php';
 require_once dirname(__FILE__).'/rester.class.php';
 
-//=============================================================================
+// -----------------------------------------------------------------------------
 /// catch 되지 않은 예외에 대한 처리함수
-//=============================================================================
+// -----------------------------------------------------------------------------
 set_exception_handler(function($e) {
-    rester::failure();
-    rester::error($e);
+    rester_response::error($e);
 });
 
 
-//=============================================================================
+// -----------------------------------------------------------------------------
 /// 오류출력설정
-//=============================================================================
+// -----------------------------------------------------------------------------
 if (cfg::Get('default', 'debug_mode'))
     error_reporting(E_ALL ^ (E_NOTICE | E_STRICT | E_WARNING | E_DEPRECATED));
 else
     error_reporting(0);
 
-//=============================================================================
+// -----------------------------------------------------------------------------
 /// timezone 설정
 /// rester.ini
-//=============================================================================
+// -----------------------------------------------------------------------------
 date_default_timezone_set(cfg::Get('default', 'timezone'));
 
-//=============================================================================
+// -----------------------------------------------------------------------------
 /// Set the global variables [_POST / _GET / _COOKIE]
 /// initial a post and a get variables.
 /// if not support short grobal variables, will be avariable.
-//=============================================================================
+// -----------------------------------------------------------------------------
 if (isset($HTTP_POST_VARS) && !isset($_POST))
 {
     $_POST   = &$HTTP_POST_VARS;
@@ -90,4 +92,3 @@ if (get_magic_quotes_gpc())
 if(is_array($_POST)) array_walk_recursive($_POST, function(&$item){ $item = addslashes($item); });
 if(is_array($_GET)) array_walk_recursive($_GET, function(&$item){ $item = addslashes($item); });
 if(is_array($_COOKIE)) array_walk_recursive($_COOKIE, function(&$item){ $item = addslashes($item); });
-

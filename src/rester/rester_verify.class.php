@@ -1,103 +1,89 @@
 <?php
 namespace rester\sql;
 use Exception;
-
 /**
- * Class Schema
- * kevinpark@webace.co.kr
+ * Class rester_verify
  *
- * 스키마 정의를 받아서 validation 을 수행해 줌
- *
+ * @package rester\sql
  */
-class schema
+class rester_verify
 {
-    const FIELD_TYPE = 'type';
-    const FIELD_REQUIRE = 'require';
-    const FIELD_DEFAULT = 'default';
-    const FIELD_REGEXP = 'regexp';
-    const FIELD_OPTIONS = 'options';
-
+    const TYPE = 'type';
     const TYPE_REGEX = 'regexp';
     const TYPE_FUNCTION = 'function';
     const TYPE_FILTER = 'filter';
+    const TYPE_TOKEN = 'token';
 
-    private $schema = array('token'=>array('type'=>'token'));
+    const OPTIONS = 'options';
+
+    const REGEXP = 'regexp';
+    const DEFAULT = 'default';
+    const REQUIRE = 'require';
+
+    const TOKEN = 'token';
 
     /**
-     * Schema constructor.
+     * @var array
+     */
+    protected $filter = [
+        self::TOKEN=>[
+            self::TYPE=>self::TYPE_TOKEN
+        ]
+    ];
+
+    /**
+     * @var array
+     */
+    protected $result;
+
+    /**
+     * @var string
+     */
+    protected $module;
+
+    /**
+     * @var string
+     */
+    protected $proc;
+
+    /**
+     * rester_verify constructor.
      *
-     * @param string $schema json file | .ini file path
+     * @param $module
+     * @param $proc
      *
      * @throws Exception
      */
-    public function __construct($schema)
+    public function __construct($module,$proc)
     {
-        try
+        $this->module = $module;
+        $this->proc = $proc;
+        $this->result = [];
+
+        // 사용자 함수 있으면 추가
+        if($path_user_function = $this->path_user_func())
         {
-            // ini,json file
-            if(is_file($schema))
+            include $path_user_function;
+        }
+
+        // init
+        if($path = $this->path())
+        {
+            $cfg = parse_ini_file($path,true, INI_SCANNER_RAW);
+            foreach($cfg as $k=>$v)
             {
-                $ext = array_pop(explode('.',$schema));
-                if($ext == 'ini') $this->set_schema_file_ini($schema);
-                elseif($ext == 'json') $this->set_schema_file_json($schema);
-                else throw new Exception("Not supported file format.");
-            }
-            // error : not support
-            else
-            {
-                throw new Exception("Not supported schema format.(.ini, .json)");
+                foreach($v as $kk=>$vv)
+                {
+                    $this->filter[$k][$kk] = $vv;
+                }
             }
         }
-        catch (Exception $e) { throw $e; }
-    }
 
-    /**
-     * insert json file schema
-     *
-     * @param string $file_path
-     *
-     * @throws Exception
-     */
-    protected function set_schema_file_json($file_path)
-    {
-        $this->set_schema(json_decode(file_get_contents($file_path),true));
-    }
-
-    /**
-     * insert ini file schema
-     *
-     * @param string $file_path
-     *
-     * @throws Exception
-     */
-    protected function set_schema_file_ini($file_path)
-    {
-        $this->set_schema(parse_ini_file($file_path,true, INI_SCANNER_RAW));
-    }
-
-    /**
-     * 스키마를 설정함
-     *
-     * @param array $data
-     *
-     * 스키마구조
-     * ----------
-     * key[type] 필수
-     * key[regexp] 정규식 (type=regexp)
-     * key[filter] integer php 함수의 필터값 (type=filter)
-     * key[options] integer php 함수의 옵션값 (type=filter)
-     *
-     * @throws Exception
-     */
-    protected function set_schema($data)
-    {
-        // check parameter
-        if(!is_array($data)) throw new Exception("Invalid parameter.(array)");
-
-        foreach ($data as $k=>$v)
+        // filter 검증
+        foreach ($this->filter as $k=>$v)
         {
             // 필드타입에 따라 옵션으로 필수로 받는 내용이 달라진다.
-            switch ($v['type'])
+            switch ($v[self::TYPE])
             {
                 case self::TYPE_REGEX: if(!isset($v[self::TYPE_REGEX])) throw new Exception("Required parameter.[regexp]"); break;
                 case self::TYPE_FILTER: if(!isset($v[self::TYPE_FILTER])) throw new Exception("Required parameter.[filter]"); break;
@@ -107,11 +93,57 @@ class schema
                     if (!method_exists($this, $func)) throw new Exception("Not supported type. ({$v['type']})");
             }
         }
-        $data['token'] = array('type'=>'token');
-        $this->schema = $data;
     }
 
     /**
+     * Path to verify file
+     *
+     * @return bool|string
+     */
+    protected function path()
+    {
+        $path = implode('/',array(
+            dirname(__FILE__).'/../'.rester::path_module,
+            $this->module,
+            $this->proc.'.ini'
+        ));
+
+        if(is_file($path)) return $path;
+        return false;
+    }
+
+    /**
+     * Path to verify file
+     *
+     * @return bool|string
+     */
+    protected function path_user_func()
+    {
+        $path = implode('/',array(
+            dirname(__FILE__).'/../'.rester::path_module,
+            $this->module,
+            $this->proc.'.verify.php'
+        ));
+
+        if(is_file($path)) return $path;
+        return false;
+    }
+
+    /**
+     *
+     * @param null|string $key
+     * @return bool|mixed
+     */
+    public function param($key=null)
+    {
+        if(isset($this->result[$key])) return $this->result[$key];
+        if($key == null) return $this->result;
+        return false;
+    }
+
+    /**
+     * verify request parameter
+     *
      * @param array $data
      *
      * @return array
@@ -119,36 +151,36 @@ class schema
      */
     public function validate($data)
     {
-        // check param
-        if(!is_array($data)) return array();
+        // reset result
+        $this->result = [];
 
+        // check param
+        if(!is_array($data)) return [];
+
+        // 연관배열 검사
         if(sizeof($data)>0)
         {
             $keys = array_keys($data);
             if(!is_array($data) || (array_keys($keys) === $keys)) throw new Exception("Invalid parameter.(associative array)");
         }
 
-        $result = array();
-
-        foreach($this->schema as $k=>$v)
+        foreach($this->filter as $k=>$v)
         {
             $schema = $v;
-            $default = false;
-            if(isset($v[self::FIELD_DEFAULT])) $default = $v[self::FIELD_DEFAULT];
-            $require = $v[self::FIELD_REQUIRE]=='true'?true:false;
 
-            $type = $v[self::FIELD_TYPE];
+            // 기본값
+            $result = false;
+            if(isset($v[self::DEFAULT])) $result = $v[self::DEFAULT];
 
-            $_result = $default;
-
+            $type = $v[self::TYPE];
             if($data[$k])
             {
                 switch ($type)
                 {
                     // Using Regular Expressions : preg_match
                     case self::TYPE_REGEX:
-                        if (preg_match($schema[self::FIELD_REGEXP], $data[$k], $matches))
-                            $_result = $matches[0];
+                        if (preg_match($schema[self::REGEXP], $data[$k], $matches))
+                            $result = $matches[0];
                         break;
 
                     // php validate function
@@ -158,37 +190,40 @@ class schema
                         $filter = null;
                         $options = null;
                         eval("\$filter = " . $schema[self::TYPE_FILTER] . ";");
-                        if($schema[self::FIELD_OPTIONS]) eval("\$options = " . $schema[self::FIELD_OPTIONS] . ";");
+                        if($schema[self::OPTIONS]) eval("\$options = " . $schema[self::OPTIONS] . ";");
 
                         if(!is_integer($filter)) throw new Exception($k.'='.$data[$k]." : Invalid filter format.");
                         if($options !== null && !is_integer($options)) throw new Exception($k.'='.$data[$k]." : Filter option format is invalid.");
-                        if (false !== ($clean = filter_var($data[$k], $filter, $options))) $_result = $clean;
+                        if (false !== ($clean = filter_var($data[$k], $filter, $options))) $result = $clean;
                         break;
 
                     // User Define Function
                     // 사용자 정의 함수는 호출 가능할 때만 실행
                     case self::TYPE_FUNCTION:
                         $func = $k;
-                        if (is_callable($func) && ($clean = $func($data[$k]))) $_result = $clean;
+                        if (is_callable($func) && ($clean = $func($data[$k]))) $result = $clean;
                         break;
 
                     // rester define function
                     default:
-                        $func = 'validate_' . $schema[self::FIELD_TYPE];
-                        if (method_exists($this, $func)) $_result = $this->$func($data[$k]);
+                        $func = 'validate_' . $schema[self::TYPE];
+                        if (method_exists($this, $func)) $result = $this->$func($data[$k]);
                         else throw new Exception($k.'='.$data[$k]." : There is no Rester definition function.");
                 }
             }
 
-            if($require && !$_result)
+            // 필수입력 체크
+            $require = $v[self::REQUIRE]=='true'?true:false;
+            if($require && !$result)
             {
                 throw new Exception($k." : The required input data does not have a value or pass validation.");
             }
-            $result[$k] = $_result;
+            $this->result[$k] = $result;
         }
-
-        return $result;
+        return $this->result;
     }
+
+    // get verified param
 
     /**
      * @param string $data
@@ -421,4 +456,3 @@ class schema
         return $data;
     }
 }
-
