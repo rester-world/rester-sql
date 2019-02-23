@@ -30,6 +30,21 @@ class cfg
 
     );
 
+    const database = 'database';
+    const database_default = 'default';
+
+    /**
+     * @param string $select
+     *
+     * @return bool
+     */
+    public static function database($select=self::database_default)
+    {
+        $result = false;
+        if($v = self::$data[self::database][$select]) $result = $v;
+        return $result;
+    }
+
     /**
      * @return string
      */

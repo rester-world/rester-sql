@@ -9,6 +9,12 @@ use Redis;
  * kevinpark@webace.co.kr
  *
  * 기본 핵심 모듈
+ *
+ * cfg
+ * pdo
+ * module
+ * proc
+ * path
  */
 class rester
 {
@@ -71,7 +77,9 @@ class rester
             self::reset_parameter();
             $schema = new schema($path_verify);
             if($data = $schema->validate(cfg::parameter()))
+            {
                 foreach($data as $k => $v) rester::set_request_param($k, $v);
+            }
         }
     }
 
@@ -160,12 +168,7 @@ class rester
         /// check request parameter
         /// check body | query string
         //=====================================================================
-        if($path_verify = self::path_verify())
-        {
-            $schema = new schema($path_verify);
-            if($data = $schema->validate(cfg::parameter()))
-                foreach($data as $k => $v) rester::set_request_param($k, $v);
-        }
+        self::check_parameter();
 
         //=====================================================================
         /// check files
@@ -246,14 +249,24 @@ class rester
                 $params[$k] = $v;
         }
 
+        // 쿼리문장에 바인드 해야할 변수와 일치 하는지 매칭함
+        preg_match_all('/:[a-zA-z0-9_-]+/', $query, $matches);
+        foreach($matches[0] as $match)
+        {
+            if(!isset($params[$match]))
+                throw new Exception("There is no parmeter for bind. [{$match}]");
+        }
+
+
+        $response_data = [];
         $stmt = $pdo->prepare($query,[PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY]);
         $stmt->execute($params);
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $response_data = [];
         foreach($res as $row)
         {
             $response_data[] = $row;
         }
+
         return $response_data;
     }
 
@@ -350,11 +363,11 @@ class rester
 
             if($path_sql)
             {
-                $res= self::execute_sql($path_sql);
+                $res = self::execute_sql($path_sql);
             }
             elseif($path_proc)
             {
-                $res= include $path_proc;
+                $res = include $path_proc;
             }
             else
             {
