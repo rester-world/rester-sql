@@ -48,7 +48,7 @@ class db
             // 처음 호출이면 아래 내용 실행
             if (self::$inst[$config_name] == null)
             {
-                $cfg = cfg::Get(self::cfg_name,$config_name);
+                $cfg = cfg::database($config_name);
 
                 // 모듈을 호출하여 데이터베이스 정보를 받아옴
                 if($cfg[self::cfk_type]==self::type_db_dynamic)

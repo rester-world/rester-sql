@@ -20,21 +20,6 @@ class rester
 {
     const path_module = 'modules';
 
-    const cfg_file_name = 'config.ini';
-
-    const cfg_common = 'common';
-    const cfg_common_database = 'database';
-    const cfg_common_database_default = 'default';
-
-    const cfg_auth = 'auth';
-    const cfg_cache = 'cache';
-
-    const cfg_access = 'access';
-    const cfg_access_default = 'default';
-    const cfg_access_private = 'private';
-    const cfg_access_internal = 'internal';
-    const cfg_access_public = 'public';
-
     protected static $request_param = [];
     protected static $response_body = null;
     protected static $response_code = 200;
@@ -44,12 +29,17 @@ class rester
     protected static $warning = [];
     protected static $error = [];
 
-    protected static $cfg = [];
-    protected static $cfg_default = [
-        self::cfg_common=>[
-            self::cfg_common_database=>self::cfg_common_database_default
-        ]
-    ];
+    /**
+     * @var rester_config
+     */
+    protected static $cfg;
+
+    protected static $pdo;
+    protected static $path;
+    protected static $module;
+    protected static $proc;
+    protected static $redis;
+
     protected static $check_auth = false;
     protected static $use_cache = false;
     protected static $cache_timeout;
@@ -84,45 +74,6 @@ class rester
     }
 
     /**
-     * @throws Exception
-     */
-    protected static function init_config()
-    {
-        $cfg = array();
-        if($path = self::path_cfg())
-        {
-            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
-        }
-
-        // set default value
-        foreach(self::$cfg_default as $k=>$values)
-        {
-            foreach($values as $kk=>$value)
-            {
-                if(!isset($cfg[$k][$kk]))
-                {
-                    $cfg[$k][$kk] = $value;
-                }
-            }
-        }
-        self::$cfg = $cfg;
-
-    }
-
-    /**
-     * @param string $procedure_name
-     *
-     * @return array|string
-     */
-    protected static function get_access_level($procedure_name)
-    {
-        $access_level = self::cfg(self::cfg_access,$procedure_name);
-        if(!$access_level) $access_level = self::cfg(self::cfg_access, self::cfg_access_default);
-        if(!$access_level) $access_level = self::cfg_access_public;
-        return $access_level;
-    }
-
-    /**
      * run rester
      *
      * @throws Exception
@@ -137,23 +88,19 @@ class rester
         /// Must included first!
         /// Because to use another function.
         //=====================================================================
-        self::init_config();
+        self::$cfg = new rester_config(cfg::module());
 
         //=====================================================================
         /// check cache option and auth option
         //=====================================================================
-        if(self::cfg(self::cfg_auth,$proc)) self::$check_auth = true;
-        if(self::cfg(self::cfg_cache,$proc))
-        {
-            self::$use_cache = true;
-            self::$cache_timeout = self::cfg(self::cfg_cache,$proc);
-        }
+        self::$check_auth = self::$cfg->is_auth($proc);
+        self::$cache_timeout = self::$cfg->is_cache($proc);
 
         //---------------------------------------------------------------------
         /// check access level
         //---------------------------------------------------------------------
-        $access_level = self::get_access_level($proc);
-        if($access_level != self::cfg_access_public)
+        $access_level = self::$cfg->access_level($proc);
+        if($access_level != rester_config::access_public)
             throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
 
         //=====================================================================
@@ -179,7 +126,6 @@ class rester
         {
             throw new Exception("Not found procedure. Module: {$module}, Procedure: {$proc} ");
         }
-
 
         //=====================================================================
         /// check auth
@@ -275,9 +221,7 @@ class rester
      */
     public static function db_instance()
     {
-        $dbname = self::cfg(self::cfg_common,self::cfg_common_database);
-        if(!$dbname) $dbname = self::cfg_common_database_default;
-        return db::get($dbname);
+        return db::get(self::$cfg->database());
     }
 
     /**
@@ -300,12 +244,12 @@ class rester
             unset($query);
             cfg::init_parameter();
             self::check_parameter();
-            self::init_config();
+            //self::init_config();
 
             // check access level
-            $access_level = self::get_access_level($proc);
-            if($module!=$old_module && $access_level==self::cfg_access_private)
-                throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
+//            $access_level = self::get_access_level($proc);
+//            if($module!=$old_module && $access_level==self::cfg_access_private)
+//                throw new Exception("Can not access procedure. [Module] {$module}, [Procedure] {$proc}, [Access level] {$access_level} ");
 
             $path_sql = self::path_sql();
             $path_proc = self::path_proc();
@@ -356,7 +300,7 @@ class rester
             unset($query);
             cfg::init_parameter();
             self::check_parameter();
-            self::init_config();
+//            self::init_config();
 
             $path_sql = self::path_sql();
             $path_proc = self::path_proc();
@@ -464,24 +408,6 @@ class rester
     }
 
     /**
-     * Path to config file
-     *
-     * @return bool|string
-     * @throws Exception
-     */
-    public static function path_cfg()
-    {
-        $path = implode('/',array(
-            self::path_module(),
-            cfg::module(),
-            self::cfg_file_name
-        ));
-
-        if(is_file($path)) return $path;
-        return false;
-    }
-
-    /**
      * Path to verify file
      *
      * @return bool|string
@@ -543,19 +469,6 @@ class rester
         if(isset(self::$request_param[$key])) return self::$request_param[$key];
         if($key == null) return self::$request_param;
         return false;
-    }
-
-    /**
-     * @param string $section
-     * @param string $key
-     *
-     * @return string|array
-     */
-    public static function cfg($section='', $key='')
-    {
-        if($section==='') return self::$cfg;
-        if($section && $key) return self::$cfg[$section][$key];
-        return self::$cfg[$section];
     }
 
     /**
