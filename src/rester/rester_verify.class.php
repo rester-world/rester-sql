@@ -67,10 +67,9 @@ class rester_verify
         }
 
         // init
-        $path = $this->path();
-        if($path)
+        if($path = $this->path())
         {
-            $cfg = parse_ini_file($path,true, INI_SCANNER_TYPED);
+            $cfg = parse_ini_file($path,true, INI_SCANNER_RAW);
             foreach($cfg as $k=>$v)
             {
                 foreach($v as $kk=>$vv)
