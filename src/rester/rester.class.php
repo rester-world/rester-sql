@@ -214,14 +214,16 @@ class rester
         foreach ($this->verify->param() as $k=>$v)
         {
             // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
-            if(strpos($query, $k)!==false)
+            // $k 뒤에 공백을 넣어줘야 함
+            if(strpos($query, $k.' ')!==false)
                 $params[$k] = $v;
         }
 
         // 쿼리문장에 바인드 해야할 변수와 일치 하는지 매칭함
-        preg_match_all('/:[a-zA-z0-9_-]+/', $query, $matches);
+        preg_match_all('/:[a-zA-z0-9_-]+ /', $query, $matches);
         foreach($matches[0] as $match)
         {
+            $match = trim($match);
             if(!isset($params[$match]))
                 throw new Exception("There is no parameter for bind. [{$match}]");
         }
