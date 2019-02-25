@@ -9,8 +9,6 @@ global $current_rester;
 try
 {
     require_once './rester/common.php';
-    cfg::init();
-
     $rester = new rester(cfg::module(), cfg::proc(), cfg::parameter());
     $rester->set_public_access();
     $current_rester = $rester;
