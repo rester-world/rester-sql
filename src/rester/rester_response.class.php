@@ -22,16 +22,19 @@ class rester_response
         http_response_code(self::$response_code);
         header("Content-type: application/json; charset=UTF-8");
 
-        $response_body = array(
-            'success'=>self::$success,
-            'msg'=>self::$msg,
-            'error'=>self::$error,
-            'error_trace'=>self::$error_trace,
-            'warning'=>self::$warning,
-            'data'=>self::$data
-        );
+        $body = [];
+        $body['success'] = self::$success;
+        $body['msg'] = self::$msg;
+        $body['data'] = self::$data;
 
-        echo json_encode($response_body);
+        if(cfg::debug_mode())
+        {
+            $body['warning'] = self::$warning;
+            $body['error'] = self::$error;
+            $body['error_trace'] = self::$error_trace;
+        }
+
+        echo json_encode($body);
     }
 
     /**
