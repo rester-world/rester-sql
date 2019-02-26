@@ -64,10 +64,17 @@ class rester_config
                     $this->data[$k][$kk] = $vv;
                 }
             }
-        }
-        else
-        {
-            throw new Exception("There is no config file. Check the config file [{$path}]");
+
+            // Access level 검증
+            if($this->data[self::access])
+            {
+                foreach($this->data[self::access] as $proc => $level)
+                {
+                    if( !($level==self::access_public || $level==self::access_internal || $level==self::access_private) )
+                        throw new Exception("Access level must be [public|internal|private]. ({$this->module}/{$proc})");
+                }
+            }
+
         }
     }
 
@@ -146,20 +153,13 @@ class rester_config
      * @param string $proc
      *
      * @return string
-     * @throws Exception
      */
     public function access_level($proc)
     {
         $result = self::access_public;
         if($v = $this->data[self::access][self::access_default]) $result = $v;
         if($v = $this->data[self::access][$proc]) $result = $v;
-        if(
-            $result==self::access_public ||
-            $result==self::access_internal ||
-            $result==self::access_private
-        ) return $result;
-
-        throw new Exception("Access level must be [public|internal|private]. ({$this->module}/{$proc})");
+        return $result;
     }
 
     /**
