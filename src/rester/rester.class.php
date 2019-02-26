@@ -152,17 +152,15 @@ class rester
     /**
      * run rester
      *
+     * @param rester $caller
+     *
+     * @return array|bool|mixed
      * @throws Exception
      */
-    public function run()
+    public function run($caller=null)
     {
         // check access level [public]
-        if($this->is_public_access)
-        {
-            $access_level = $this->cfg->access_level($this->proc);
-            if($access_level != rester_config::access_public)
-                throw new Exception("Can not access procedure. [Module] {$this->module}, [Procedure] {$this->proc}, [Access level] {$access_level} ");
-        }
+        $this->check_access_level($caller);
 
         // check auth
         if($this->check_auth) { session::get(cfg::token()); }
@@ -255,4 +253,41 @@ class rester
      * @return string
      */
     public function proc() { return $this->proc; }
+
+    /**
+     * @param rester $caller_rester
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function check_access_level($caller_rester)
+    {
+        $access = false;
+        $ac_level = $this->cfg->access_level($this->proc);
+        $caller_module = '';
+        if($caller_rester!==null) $caller_module = $caller_rester->module();
+        switch ($ac_level)
+        {
+            // 동일한 모듈
+            case rester_config::access_private:
+                if($this->module() == $caller_module) $access = true;
+                break;
+
+            // 외부호출 아닐때
+            case rester_config::access_internal:
+                if(!$this->is_public_access) $access = true;
+                break;
+
+            // 모두 통과
+            case rester_config::access_public: $access = true; break;
+        }
+        if($access===false)
+            throw new Exception("Can not access procedure. [Module] {$this->module}, [Procedure] {$this->proc}, [Access level] {$ac_level} ");
+        return $access;
+    }
+
+    /**
+     * @return string
+     */
+    public function access_level() { return $this->cfg->access_level($this->proc); }
 }

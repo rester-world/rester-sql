@@ -1,4 +1,4 @@
 
 select *
-FROM `db2_table`
+FROM `rester-sql2`.db2_table
 LIMIT 1
