@@ -173,7 +173,7 @@ class rester_verify
             if(isset($v[self::DEFAULT])) $result = $v[self::DEFAULT];
 
             $type = $v[self::TYPE];
-            if($data[$k])
+            if($data[$k]!==null)
             {
                 switch ($type)
                 {
@@ -205,9 +205,20 @@ class rester_verify
                         break;
 
                     // rester define function
+                    // 필터 오류시 warning 으로
                     default:
                         $func = 'validate_' . $schema[self::TYPE];
-                        if (method_exists($this, $func)) $result = $this->$func($data[$k]);
+                        if (method_exists($this, $func))
+                        {
+                            try
+                            {
+                                $result = $this->$func($data[$k]);
+                            }
+                            catch(Exception $e)
+                            {
+                                rester_response::warning($e->getMessage());
+                            }
+                        }
                         else throw new Exception($k.'='.$data[$k]." : There is no Rester definition function.");
                 }
             }
@@ -418,12 +429,12 @@ class rester_verify
      * @param $data
      *
      * @return string
+     * @throws Exception
      */
     protected function validate_json($data)
     {
-        $ret = false;
-        if(@json_decode(stripslashes($data),true)) $ret = $data;
-        return $ret;
+        if(@json_decode(stripslashes($data),true)) return $data;
+        else throw new Exception("Invalid data(json) : {$data}");
     }
 
     /**
