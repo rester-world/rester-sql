@@ -216,7 +216,10 @@ class rester
             // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
             // $k 뒤에 공백을 넣어줘야 함
             if(strpos($query, $k.' ')!==false)
+            {
+                if(strpos($k,':')!==0) $k = ':'.$k;
                 $params[$k] = $v;
+            }
         }
 
         // 쿼리문장에 바인드 해야할 변수와 일치 하는지 매칭함
