@@ -1,9 +1,9 @@
-<?php use rester\sql\rester;
+<?php
 use rester\sql\session;
 
 if(!defined('__RESTER__')) exit;
 
-$id = rester::param('session_id');
+$id = request_param('session_id');
 $token = session::set($id);
 
 return array(

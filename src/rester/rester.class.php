@@ -115,12 +115,10 @@ class rester
         $this->verify->validate($request_data);
 
         // check auth
-        $this->check_auth = false;
-        $this->cfg->is_auth($proc);
+        $this->check_auth = $this->cfg->is_auth($proc);
 
         // check cache
-        $this->cache_timeout = false;
-        $this->cfg->is_cache($proc);
+        $this->cache_timeout = $this->cfg->is_cache($proc);
 
         // set redis
         $this->redis = false;
@@ -210,25 +208,20 @@ class rester
         $query = file_get_contents($path);
 
         // 필터링 된 파라미터를 받아옴
+        // 영문숫자_-로 조합된 키워드 추출
         $params = [];
-        foreach ($this->verify->param() as $k=>$v)
+        preg_match_all('/:[a-zA-z0-9_-]+/', $query, $matches);
+        $matches = $matches[0];
+
+        foreach($matches as $bind_param)
         {
-            // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
-            // $k 뒤에 공백을 넣어줘야 함
-            if(strpos($query, $k.' ')!==false)
+            foreach ($this->verify->param() as $k=>$v)
             {
                 if(strpos($k,':')!==0) $k = ':'.$k;
-                $params[$k] = $v;
+                if($bind_param==$k) $params[$bind_param] = $v;
             }
-        }
-
-        // 쿼리문장에 바인드 해야할 변수와 일치 하는지 매칭함
-        preg_match_all('/:[a-zA-z0-9_-]+ /', $query, $matches);
-        foreach($matches[0] as $match)
-        {
-            $match = trim($match);
-            if(!isset($params[$match]))
-                throw new Exception("There is no parameter for bind. [{$match}]");
+            if(!isset($params[$bind_param]))
+                throw new Exception("There is no parameter for bind. [{$bind_param}]");
         }
 
         $response_data = [];
