@@ -45,6 +45,11 @@ class cfg
         return $result;
     }
 
+    public static function debug_mode()
+    {
+        return self::$data['default']['debug_mode'];
+    }
+
     /**
      * @return string
      */

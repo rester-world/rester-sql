@@ -25,9 +25,19 @@ require_once dirname(__FILE__).'/rester.class.php';
 /// catch 되지 않은 예외에 대한 처리함수
 // -----------------------------------------------------------------------------
 set_exception_handler(function($e) {
-    rester_response::error($e);
+    rester_response::error_trace(explode("\n",$e));
+    rester_response::run();
 });
 
+try
+{
+    cfg::init();
+}
+catch (Exception $e)
+{
+    rester_response::error($e->getMessage());
+    rester_response::error_trace(explode("\n",$e->getTraceAsString()));
+}
 
 // -----------------------------------------------------------------------------
 /// 오류출력설정

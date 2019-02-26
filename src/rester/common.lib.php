@@ -37,7 +37,7 @@ function request_module($module, $proc, $query=[])
     try
     {
         $current_rester = new rester($module, $proc, $query);
-        $res = $current_rester->run();
+        $res = $current_rester->run($old_rester);
     }
     catch (Exception $e)
     {
@@ -63,7 +63,7 @@ function request_procedure($proc, $query=[])
     try
     {
         $current_rester = new rester($current_rester->module(), $proc, $query);
-        $res = $current_rester->run();
+        $res = $current_rester->run($old_rester);
     }
     catch (Exception $e)
     {

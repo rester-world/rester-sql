@@ -115,12 +115,10 @@ class rester
         $this->verify->validate($request_data);
 
         // check auth
-        $this->check_auth = false;
-        $this->cfg->is_auth($proc);
+        $this->check_auth = $this->cfg->is_auth($proc);
 
         // check cache
-        $this->cache_timeout = false;
-        $this->cfg->is_cache($proc);
+        $this->cache_timeout = $this->cfg->is_cache($proc);
 
         // set redis
         $this->redis = false;
@@ -154,17 +152,15 @@ class rester
     /**
      * run rester
      *
+     * @param rester $caller
+     *
+     * @return array|bool|mixed
      * @throws Exception
      */
-    public function run()
+    public function run($caller=null)
     {
         // check access level [public]
-        if($this->is_public_access)
-        {
-            $access_level = $this->cfg->access_level($this->proc);
-            if($access_level != rester_config::access_public)
-                throw new Exception("Can not access procedure. [Module] {$this->module}, [Procedure] {$this->proc}, [Access level] {$access_level} ");
-        }
+        $this->check_access_level($caller);
 
         // check auth
         if($this->check_auth) { session::get(cfg::token()); }
@@ -210,20 +206,20 @@ class rester
         $query = file_get_contents($path);
 
         // 필터링 된 파라미터를 받아옴
+        // 영문숫자_-로 조합된 키워드 추출
         $params = [];
-        foreach ($this->verify->param() as $k=>$v)
-        {
-            // 필터링 된 파라미터 라도 query 문장에 포함된 필드만 입력함
-            if(strpos($query, $k)!==false)
-                $params[$k] = $v;
-        }
-
-        // 쿼리문장에 바인드 해야할 변수와 일치 하는지 매칭함
         preg_match_all('/:[a-zA-z0-9_-]+/', $query, $matches);
-        foreach($matches[0] as $match)
+        $matches = $matches[0];
+
+        foreach($matches as $bind_param)
         {
-            if(!isset($params[$match]))
-                throw new Exception("There is no parameter for bind. [{$match}]");
+            foreach ($this->verify->param() as $k=>$v)
+            {
+                if(strpos($k,':')!==0) $k = ':'.$k;
+                if($bind_param==$k) $params[$bind_param] = $v;
+            }
+            if(!isset($params[$bind_param]))
+                throw new Exception("There is no parameter for bind. [{$bind_param}]");
         }
 
         $response_data = [];
@@ -257,4 +253,41 @@ class rester
      * @return string
      */
     public function proc() { return $this->proc; }
+
+    /**
+     * @param rester $caller_rester
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function check_access_level($caller_rester)
+    {
+        $access = false;
+        $ac_level = $this->cfg->access_level($this->proc);
+        $caller_module = '';
+        if($caller_rester!==null) $caller_module = $caller_rester->module();
+        switch ($ac_level)
+        {
+            // 동일한 모듈
+            case rester_config::access_private:
+                if($this->module() == $caller_module) $access = true;
+                break;
+
+            // 외부호출 아닐때
+            case rester_config::access_internal:
+                if(!$this->is_public_access) $access = true;
+                break;
+
+            // 모두 통과
+            case rester_config::access_public: $access = true; break;
+        }
+        if($access===false)
+            throw new Exception("Can not access procedure. [Module] {$this->module}, [Procedure] {$this->proc}, [Access level] {$ac_level} ");
+        return $access;
+    }
+
+    /**
+     * @return string
+     */
+    public function access_level() { return $this->cfg->access_level($this->proc); }
 }
