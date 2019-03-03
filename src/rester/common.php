@@ -53,6 +53,14 @@ else
 // -----------------------------------------------------------------------------
 date_default_timezone_set(cfg::Get('default', 'timezone'));
 
+//-------------------------------------------------------------------------------
+/// set php.ini
+//-------------------------------------------------------------------------------
+set_time_limit(0);
+ini_set("session.use_trans_sid", 0); // PHPSESSID 를 자동으로 넘기지 않음
+ini_set("url_rewriter.tags","");     // 링크에 PHPSESSID 가 따라다니는것을 무력화
+ini_set("default_socket_timeout",500);
+
 // -----------------------------------------------------------------------------
 /// Set the global variables [_POST / _GET / _COOKIE]
 /// initial a post and a get variables.
