@@ -80,12 +80,13 @@ CONTAINER ID        IMAGE                      COMMAND                  CREATED 
 자세한 예제와 설명은 설명서를 참조.
 
 - 기본 구조
-    - [기본 구조]()
+    - [기본 구조](https://github.com/rester-world/rester-sql/wiki/%EA%B8%B0%EB%B3%B8-%EA%B5%AC%EC%A1%B0)
 - 기본 기능
     - [모듈 추가하기](https://github.com/rester-world/rester-sql/wiki/%EB%AA%A8%EB%93%88-%EC%B6%94%EA%B0%80)
     - [SQL형식의 프로시저 추가하기](https://github.com/rester-world/rester-sql/wiki/SQL-%ED%94%84%EB%A1%9C%EC%8B%9C%EC%A0%80-%EC%B6%94%EA%B0%80)
     - [PHP형식의 프로시저 추가하기](https://github.com/rester-world/rester-sql/wiki/PHP-%ED%94%84%EB%A1%9C%EC%8B%9C%EC%A0%80-%EC%B6%94%EA%B0%80)
 - 설정 기능
+    - [기본 설정](https://github.com/rester-world/rester-sql/wiki/%EA%B8%B0%EB%B3%B8-%EC%84%A4%EC%A0%95)
     - [모듈 설정](https://github.com/rester-world/rester-sql/wiki/%EB%AA%A8%EB%93%88-%EC%84%A4%EC%A0%95)
     - [프로시저 설정](https://github.com/rester-world/rester-sql/wiki/%ED%94%84%EB%A1%9C%EC%8B%9C%EC%A0%80-%EC%84%A4%EC%A0%95)
 - 심화 기능
