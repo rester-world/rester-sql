@@ -75,6 +75,47 @@ function request_procedure($proc, $query=[])
 }
 
 /**
+ * @param string $name
+ * @param string $module
+ * @param string $proc
+ * @param array  $param
+ *
+ * @return bool|array
+ */
+function request($name, $module, $proc, $param=[])
+{
+    try
+    {
+        $cfg = cfg::request($name);
+        if(!$cfg || !$cfg[cfg::request_host] || !$cfg[cfg::request_port]) throw new Exception("There is no config.({$name})");
+        if(!$module) throw new Exception("\$module is a required input.");
+        if(!$proc) throw new Exception("\$proc is a required input.");
+        $url = implode('/',array( $cfg['host'].':'.$cfg['port'], 'v1', $module, $proc ));
+
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($param),
+        ));
+
+        $response_body = curl_exec($ch);
+        curl_close($ch);
+        return json_decode($response_body,true);
+    }
+    catch (Exception $e)
+    {
+        rester_response::error($e->getMessage());
+        return false;
+    }
+}
+
+/**
  * @param string $module
  * @param string $proc
  * @param array $query
