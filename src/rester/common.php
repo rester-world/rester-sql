@@ -42,7 +42,7 @@ catch (Exception $e)
 // -----------------------------------------------------------------------------
 /// 오류출력설정
 // -----------------------------------------------------------------------------
-if (cfg::Get('default', 'debug_mode'))
+if (cfg::debug_mode())
     error_reporting(E_ALL ^ (E_NOTICE | E_STRICT | E_WARNING | E_DEPRECATED));
 else
     error_reporting(0);
@@ -51,7 +51,7 @@ else
 /// timezone 설정
 /// rester.ini
 // -----------------------------------------------------------------------------
-date_default_timezone_set(cfg::Get('default', 'timezone'));
+date_default_timezone_set(cfg::timezone());
 
 //-------------------------------------------------------------------------------
 /// set php.ini
@@ -60,6 +60,10 @@ set_time_limit(0);
 ini_set("session.use_trans_sid", 0); // PHPSESSID 를 자동으로 넘기지 않음
 ini_set("url_rewriter.tags","");     // 링크에 PHPSESSID 가 따라다니는것을 무력화
 ini_set("default_socket_timeout",500);
+
+ini_set("memory_limit", "1000M");     // 메모리 용량 설정.
+ini_set("post_max_size","1000M");
+ini_set("upload_max_filesize","1000M");
 
 // -----------------------------------------------------------------------------
 /// Set the global variables [_POST / _GET / _COOKIE]
