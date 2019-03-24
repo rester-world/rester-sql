@@ -5,7 +5,7 @@ RUN mkdir /var/www/cfg
 
 ADD cfg /var/www/cfg
 ADD src /var/www/html
-ADD default.conf /etc/nginx/sites-available/default.conf
+ADD nginx-conf/default.conf /etc/nginx/sites-available/default.conf
 
 VOLUME ["/var/www/cfg"]
 VOLUME ["/var/www/html/modules"]
