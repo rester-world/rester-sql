@@ -115,6 +115,11 @@ function request($name, $module, $proc, $param=[])
     }
 }
 
+function gen_secret_key()
+{
+
+}
+
 /**
  * @param string $module
  * @param string $proc
