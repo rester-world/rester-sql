@@ -1,13 +1,4 @@
 <?php
-namespace rester\sql;
-use Exception;
-use PDO;
-
-/**
- * Class db
- *
- * @package rester\sql
- */
 class db
 {
     /**
@@ -59,7 +50,7 @@ class db
                     $proc = $cfg[self::type_db_dynamic_proc];
                     if($module && $proc)
                     {
-                        $rester = new rester($module,$proc,cfg::parameter());
+                        $rester = new resterSQL($module,$proc,cfg::request_body());
                         $cfg = $rester->run($current_rester);
                         if(!$cfg[self::cfk_host] && is_array($cfg[0])) $cfg = array_pop($cfg);
                     }
