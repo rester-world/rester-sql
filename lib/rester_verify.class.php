@@ -249,6 +249,19 @@ class rester_verify
     }
 
     /**
+     * @param string $data
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function validate_ip($data)
+    {
+        $result = filter_var($data,FILTER_VALIDATE_IP);
+        if($result) return $result;
+        throw new Exception("Invalid data(ip) : {$data} ");
+    }
+
+    /**
      * @param $data
      *
      * @return mixed
@@ -363,7 +376,7 @@ class rester_verify
      */
     protected function validate_token($data)
     {
-        if(preg_match('/^[0-9a-zA-Z.]+$/', $data, $matches)) return $data;
+        if(preg_match('/^[0-9a-zA-Z.!@#$%^&()-_*=+]+$/', $data, $matches)) return $data;
         throw new Exception("Invalid data(token) : {$data}");
     }
 
