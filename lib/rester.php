@@ -3,23 +3,19 @@
  *  @file common.php
  *  @brief  가장 먼저 실행되는 파일이면서 각종 초기화를 수행함
  */
-
-use rester\sql\cfg;
-use rester\sql\rester_response;
-
 define('__RESTER__', TRUE);
 
 // -----------------------------------------------------------------------------
 /// include classes
 // -----------------------------------------------------------------------------
-require_once dirname(__FILE__) . '/common.lib.php';
-require_once dirname(__FILE__) . '/cfg.class.php';
-require_once dirname(__FILE__) . '/db.class.php';
-require_once dirname(__FILE__) . '/session.class.php';
-require_once dirname(__FILE__) . '/rester_response.class.php';
-require_once dirname(__FILE__) . '/rester_config.class.php';
-require_once dirname(__FILE__) . '/rester_verify.class.php';
-require_once dirname(__FILE__) . '/rester.class.php';
+require_once dirname(__FILE__) . '/core/common.lib.php';
+require_once dirname(__FILE__) . '/core/cfg.class.php';
+require_once dirname(__FILE__) . '/core/session.class.php';
+require_once dirname(__FILE__) . '/core/rester_response.class.php';
+require_once dirname(__FILE__) . '/core/rester_config.class.php';
+require_once dirname(__FILE__) . '/core/rester_verify.class.php';
+require_once dirname(__FILE__) . '/core/db.class.php';
+require_once dirname(__FILE__) . '/resterSQL.class.php';
 
 // -----------------------------------------------------------------------------
 /// catch 되지 않은 예외에 대한 처리함수
