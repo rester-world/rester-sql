@@ -1,14 +1,4 @@
 <?php
-namespace rester\sql;
-use Exception;
-use PDO;
-use Redis;
-
-/**
- * Class rester
- *
- * @package rester\sql
- */
 class rester
 {
     const path_module = 'modules';
