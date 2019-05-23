@@ -34,7 +34,7 @@ class resterSQL extends rester
      */
     protected function path_proc($module, $proc, $method)
     {
-        $base_path = dirname(__FILE__).'/../'.self::path_module;
+        $base_path = dirname(__FILE__).'/../src';
 
         // 프로시저 경로 설정
         $path_proc = false;
@@ -66,7 +66,7 @@ class resterSQL extends rester
     protected function path_verify()
     {
         $path = implode('/',array(
-            dirname(__FILE__).'/../'.rester::path_module,
+            dirname(__FILE__).'/../src',
             $this->module,
             $this->proc.'.ini'
         ));
@@ -81,7 +81,7 @@ class resterSQL extends rester
     protected function path_verify_user_func()
     {
         $path = implode('/',array(
-            dirname(__FILE__).'/../'.rester::path_module,
+            dirname(__FILE__).'/../src',
             $this->module,
             $this->proc.'.verify.php'
         ));

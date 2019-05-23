@@ -51,8 +51,9 @@ services:
   volumes:
    - ./nginx-conf:/etc/nginx/sites-available:ro
    - ./cfg:/var/www/cfg:ro
+   - ./rester-core:/var/www/rester-core
+   - ./rester-sql:/var/www/rester-sql
    - ./src:/var/www/src
-   - ./lib:/var/www/lib
   ports:
   - '80:80'
   - '443:443'
