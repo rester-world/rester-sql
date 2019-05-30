@@ -34,6 +34,7 @@ class db
     public static function get($config_name='default')
     {
         global $current_rester;
+        $old_rester = $current_rester;
         try
         {
             if(!is_string($config_name)) throw new Exception("The parameter must be a string.");
@@ -51,7 +52,9 @@ class db
                     if($module && $proc)
                     {
                         $rester = new resterSQL($module,$proc,cfg::request_body());
+                        $current_rester = $rester;
                         $cfg = $rester->run($current_rester);
+                        $current_rester = $old_rester;
                         if(!$cfg[self::cfk_host] && is_array($cfg[0])) $cfg = array_pop($cfg);
                     }
                     else
