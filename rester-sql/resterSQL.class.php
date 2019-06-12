@@ -143,6 +143,7 @@ class resterSQL extends rester
     public function execute_sql($path)
     {
         $pdo = db::get($this->cfg->database());
+
         $queries = file_get_contents($path);
         $response_data = [];
         foreach(explode(';',$queries) as $query)

@@ -43,6 +43,7 @@ class db
             if (self::$inst[$config_name] == null)
             {
                 $cfg = cfg::database($config_name);
+                $timezone = cfg::timezone();
 
                 // 모듈을 호출하여 데이터베이스 정보를 받아옴
                 if($cfg[self::cfk_type]==self::type_db_dynamic)
@@ -74,6 +75,8 @@ class db
                 self::$inst[$config_name] = new PDO($dsn, $cfg[self::cfk_user], $cfg[self::cfk_password]);
                 self::$inst[$config_name]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 self::$inst[$config_name]->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+                // 시간대 자동설정
+                self::$inst[$config_name]->prepare(" SET time_zone='{$timezone}' ")->execute();
             }
             return self::$inst[$config_name];
         }
