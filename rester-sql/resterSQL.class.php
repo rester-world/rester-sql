@@ -121,10 +121,11 @@ class resterSQL extends rester
         {
             // check broker
             $db_cfg = cfg::database($this->cfg->database());
-            if($db_cfg[db::cfk_type] == db::type_db_broker)
+            if(($db_cfg[db::cfk_type] == db::type_db_broker) && $this->path_proc_sql)
             {
-                $param= $this->request_param(null);
-                $response_data = exten_post($db_cfg['request'], $db_cfg['module'],$db_cfg['proc'], $param);
+                $param = $this->request_param(null);
+                $query = file_get_contents($this->path_proc_sql);
+                $response_data = response_data(exten_post($db_cfg['request'], $db_cfg['module'],$db_cfg['proc'], ['query'=>$query, 'params'=>$param]),false);
             }
             // execute sql file
             else if($this->path_proc_sql)
@@ -132,7 +133,7 @@ class resterSQL extends rester
                 $response_data = $this->execute_sql($this->path_proc_sql);
             }
             // execute php file
-            elseif($this->path_proc)
+            else if($this->path_proc)
             {
                 $response_data = include $this->path_proc;
             }
