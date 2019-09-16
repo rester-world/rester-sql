@@ -1,0 +1,9 @@
+{
+    "success": false,
+    "msg": "URL rule error",
+    "data": {
+        "rule": "//your-domain/v{version}/{module}/{procedure}",
+        "online-document": "https://rester.io",
+        "copyright": "rester.io"
+    }
+}

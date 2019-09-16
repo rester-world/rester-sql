@@ -1,6 +1,7 @@
 <?php
 if(!defined('__RESTER__')) exit;
 
+rester_response::msg("You can use it privately.");
 return [
     'type'=>'mysql',
     'host'=>'db2.rester.kr',

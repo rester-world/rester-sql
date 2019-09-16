@@ -1,15 +1,15 @@
 {
 	"info": {
-		"_postman_id": "27f3be10-2a11-4d5d-8899-c23cc4be77ca",
-		"name": "RESTer-SQL",
+		"_postman_id": "39f78b11-ec49-4ba9-a9b5-aece1606f3cc",
+		"name": "rester-sql",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "1. Basic example",
+			"name": "01. Basic example",
 			"item": [
 				{
-					"name": "Basic",
+					"name": "Hello",
 					"event": [
 						{
 							"listen": "test",
@@ -38,16 +38,15 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "{{host}}/v1/basic_example/basic",
+							"raw": "{{host}}/v1/01_basic_example/hello",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"basic_example",
-								"basic"
+								"01_basic_example",
+								"hello"
 							]
 						},
 						"description": "# POST 방식으로 호출\n- no parameter"
@@ -58,7 +57,6 @@
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
-								"body": {},
 								"url": {
 									"raw": "http://{{host}}/v1/helloworld/basic",
 									"protocol": "http",
@@ -133,7 +131,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -176,15 +174,14 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "{{host}}/v1/basic_example/notfound",
+							"raw": "{{host}}/v1/01_basic_example/notfound",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"basic_example",
+								"01_basic_example",
 								"notfound"
 							]
 						},
@@ -196,7 +193,6 @@
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
-								"body": {},
 								"url": {
 									"raw": "http://{{host}}/v1/helloworld/basic",
 									"protocol": "http",
@@ -271,7 +267,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -281,220 +277,6 @@
 								}
 							],
 							"body": "{\"success\":true,\"msg\":\"Hello world!! (POST method)\",\"data\":[\"POST \\ubc29\\uc2dd\\uc73c\\ub85c \\uc811\\uadfc\\ud558\\uc600\\uc2b5\\ub2c8\\ub2e4.\"]}"
-						}
-					]
-				},
-				{
-					"name": "Select",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": ":start",
-									"value": "0",
-									"description": ":",
-									"type": "text"
-								},
-								{
-									"key": ":rows",
-									"value": "20",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "http://{{host}}/v1/basic_example/select",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"v1",
-								"basic_example",
-								"select"
-							]
-						},
-						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
-					},
-					"response": [
-						{
-							"name": "Auth",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
-									},
-									{
-										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
-									}
-								],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "test_boolean",
-											"value": "true",
-											"type": "text"
-										},
-										{
-											"key": "test_domain",
-											"value": "domain.com",
-											"type": "text"
-										},
-										{
-											"key": "test_email",
-											"value": "test@domain.com",
-											"type": "text"
-										},
-										{
-											"key": "test_float",
-											"value": "1.7",
-											"type": "text"
-										},
-										{
-											"key": "test_int",
-											"value": "7",
-											"type": "text"
-										},
-										{
-											"key": "test_int_not_check",
-											"value": "89",
-											"type": "text"
-										},
-										{
-											"key": "test_ip",
-											"value": "127.0.0.1",
-											"type": "text"
-										},
-										{
-											"key": "test_mac",
-											"value": "00-15-5D-D7-34-2B",
-											"type": "text"
-										},
-										{
-											"key": "test_url",
-											"value": "http://www.example.com/?test=test_value",
-											"type": "text"
-										}
-									]
-								},
-								"url": {
-									"raw": "http://{{host}}/v1/helloworld/example_auth",
-									"protocol": "http",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"v1",
-										"helloworld",
-										"example_auth"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Access-Control-Allow-Headers",
-									"value": "*",
-									"name": "Access-Control-Allow-Headers",
-									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-								},
-								{
-									"key": "Access-Control-Allow-Methods",
-									"value": "*",
-									"name": "Access-Control-Allow-Methods",
-									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*",
-									"name": "Access-Control-Allow-Origin",
-									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive",
-									"name": "Connection",
-									"description": "Options that are desired for the connection"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=UTF-8",
-									"name": "Content-Type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
-									"name": "Date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "Server",
-									"value": "nginx",
-									"name": "Server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "Transfer-Encoding",
-									"value": "chunked",
-									"name": "Transfer-Encoding",
-									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "PHP/7.1.12",
-									"name": "X-Powered-By",
-									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
-								}
-							],
-							"cookie": [
-								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
-									"httpOnly": false,
-									"domain": "localhost",
-									"path": "/",
-									"secure": false,
-									"value": "6c666219a19900a95cc3905aecfaacd0",
-									"key": "PHPSESSID"
-								}
-							],
-							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
 						}
 					]
 				},
@@ -544,14 +326,14 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{host}}/v1/basic_example/insert",
+							"raw": "http://{{host}}/v1/01_basic_example/insert",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"basic_example",
+								"01_basic_example",
 								"insert"
 							]
 						},
@@ -565,13 +347,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -698,7 +478,221 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "localhost",
+									"path": "/",
+									"secure": false,
+									"value": "6c666219a19900a95cc3905aecfaacd0",
+									"key": "PHPSESSID"
+								}
+							],
+							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
+						}
+					]
+				},
+				{
+					"name": "Select",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "start",
+									"value": "0",
+									"description": ":",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "rows",
+									"value": "20",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}/v1/01_basic_example/select",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"01_basic_example",
+								"select"
+							]
+						},
+						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
+					},
+					"response": [
+						{
+							"name": "Auth",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "auth-id",
+										"value": "id_user_tmp_23"
+									},
+									{
+										"key": "x-auth-token",
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "test_boolean",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "test_domain",
+											"value": "domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_email",
+											"value": "test@domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_float",
+											"value": "1.7",
+											"type": "text"
+										},
+										{
+											"key": "test_int",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "test_int_not_check",
+											"value": "89",
+											"type": "text"
+										},
+										{
+											"key": "test_ip",
+											"value": "127.0.0.1",
+											"type": "text"
+										},
+										{
+											"key": "test_mac",
+											"value": "00-15-5D-D7-34-2B",
+											"type": "text"
+										},
+										{
+											"key": "test_url",
+											"value": "http://www.example.com/?test=test_value",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{host}}/v1/helloworld/example_auth",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"helloworld",
+										"example_auth"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*",
+									"name": "Access-Control-Allow-Headers",
+									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "*",
+									"name": "Access-Control-Allow-Methods",
+									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"name": "Access-Control-Allow-Origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8",
+									"name": "Content-Type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "Server",
+									"value": "nginx",
+									"name": "Server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.1.12",
+									"name": "X-Powered-By",
+									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -832,14 +826,14 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{host}}/v1/basic_example/verify",
+							"raw": "http://{{host}}/v1/01_basic_example/verify",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"basic_example",
+								"01_basic_example",
 								"verify"
 							]
 						},
@@ -853,13 +847,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -986,7 +978,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -1002,7 +994,7 @@
 			]
 		},
 		{
-			"name": "2. Auth example",
+			"name": "02. Auth example",
 			"item": [
 				{
 					"name": "Auth",
@@ -1039,20 +1031,20 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": ".WTNVQoaHttbLEMLoWTE",
+									"value": "jHjbQz@X7oh.OuKC=+z_r^%_=yE.VXXVd+GlJ_bg",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "http://{{host}}/v1/auth_example/auth",
+							"raw": "http://{{host}}/v1/02_auth_example/auth",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"auth_example",
+								"02_auth_example",
 								"auth"
 							]
 						},
@@ -1066,13 +1058,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -1199,7 +1189,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -1253,14 +1243,14 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{host}}/v1/auth_example/login",
+							"raw": "http://{{host}}/v1/02_auth_example/login",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"auth_example",
+								"02_auth_example",
 								"login"
 							]
 						},
@@ -1274,13 +1264,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -1407,7 +1395,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -1452,23 +1440,17 @@
 						"header": [],
 						"body": {
 							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "session_id",
-									"value": "rester login example",
-									"type": "text"
-								}
-							]
+							"formdata": []
 						},
 						"url": {
-							"raw": "http://{{host}}/v1/auth_example/cache",
+							"raw": "http://{{host}}/v1/02_auth_example/cache",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"auth_example",
+								"02_auth_example",
 								"cache"
 							]
 						},
@@ -1482,13 +1464,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -1615,7 +1595,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -1631,10 +1611,10 @@
 			]
 		},
 		{
-			"name": "3. Access level example",
+			"name": "03. Access level example",
 			"item": [
 				{
-					"name": "Private procedure",
+					"name": "Access private procedure",
 					"event": [
 						{
 							"listen": "test",
@@ -1663,17 +1643,16 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "http://{{host}}/v1/access_level_example/access_private",
+							"raw": "http://{{host}}/v1/03_1_access_level_example/private",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"access_level_example",
-								"access_private"
+								"03_1_access_level_example",
+								"private"
 							]
 						},
 						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
@@ -1686,13 +1665,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -1819,7 +1796,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -1833,7 +1810,7 @@
 					]
 				},
 				{
-					"name": "Call Private",
+					"name": "Access internal procedure",
 					"event": [
 						{
 							"listen": "test",
@@ -1862,16 +1839,211 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "http://{{host}}/v1/access_level_example2/call_private",
+							"raw": "http://{{host}}/v1/03_1_access_level_example/internal",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"access_level_example2",
+								"03_1_access_level_example",
+								"internal"
+							]
+						},
+						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
+					},
+					"response": [
+						{
+							"name": "Auth",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "auth-id",
+										"value": "id_user_tmp_23"
+									},
+									{
+										"key": "x-auth-token",
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "test_boolean",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "test_domain",
+											"value": "domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_email",
+											"value": "test@domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_float",
+											"value": "1.7",
+											"type": "text"
+										},
+										{
+											"key": "test_int",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "test_int_not_check",
+											"value": "89",
+											"type": "text"
+										},
+										{
+											"key": "test_ip",
+											"value": "127.0.0.1",
+											"type": "text"
+										},
+										{
+											"key": "test_mac",
+											"value": "00-15-5D-D7-34-2B",
+											"type": "text"
+										},
+										{
+											"key": "test_url",
+											"value": "http://www.example.com/?test=test_value",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{host}}/v1/helloworld/example_auth",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"helloworld",
+										"example_auth"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*",
+									"name": "Access-Control-Allow-Headers",
+									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "*",
+									"name": "Access-Control-Allow-Methods",
+									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"name": "Access-Control-Allow-Origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8",
+									"name": "Content-Type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "Server",
+									"value": "nginx",
+									"name": "Server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.1.12",
+									"name": "X-Powered-By",
+									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "localhost",
+									"path": "/",
+									"secure": false,
+									"value": "6c666219a19900a95cc3905aecfaacd0",
+									"key": "PHPSESSID"
+								}
+							],
+							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
+						}
+					]
+				},
+				{
+					"name": "Access private via same module",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}/v1/03_1_access_level_example/call_private",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"03_1_access_level_example",
 								"call_private"
 							]
 						},
@@ -1885,13 +2057,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -2018,7 +2188,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -2032,7 +2202,7 @@
 					]
 				},
 				{
-					"name": "Call Private (same module)",
+					"name": "Access Internal via external module",
 					"event": [
 						{
 							"listen": "test",
@@ -2061,414 +2231,15 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "http://{{host}}/v1/access_level_example/call_private",
+							"raw": "http://{{host}}/v1/03_2_access_level_example/call_internal",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"access_level_example",
-								"call_private"
-							]
-						},
-						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
-					},
-					"response": [
-						{
-							"name": "Auth",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
-									},
-									{
-										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
-									}
-								],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "test_boolean",
-											"value": "true",
-											"type": "text"
-										},
-										{
-											"key": "test_domain",
-											"value": "domain.com",
-											"type": "text"
-										},
-										{
-											"key": "test_email",
-											"value": "test@domain.com",
-											"type": "text"
-										},
-										{
-											"key": "test_float",
-											"value": "1.7",
-											"type": "text"
-										},
-										{
-											"key": "test_int",
-											"value": "7",
-											"type": "text"
-										},
-										{
-											"key": "test_int_not_check",
-											"value": "89",
-											"type": "text"
-										},
-										{
-											"key": "test_ip",
-											"value": "127.0.0.1",
-											"type": "text"
-										},
-										{
-											"key": "test_mac",
-											"value": "00-15-5D-D7-34-2B",
-											"type": "text"
-										},
-										{
-											"key": "test_url",
-											"value": "http://www.example.com/?test=test_value",
-											"type": "text"
-										}
-									]
-								},
-								"url": {
-									"raw": "http://{{host}}/v1/helloworld/example_auth",
-									"protocol": "http",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"v1",
-										"helloworld",
-										"example_auth"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Access-Control-Allow-Headers",
-									"value": "*",
-									"name": "Access-Control-Allow-Headers",
-									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-								},
-								{
-									"key": "Access-Control-Allow-Methods",
-									"value": "*",
-									"name": "Access-Control-Allow-Methods",
-									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*",
-									"name": "Access-Control-Allow-Origin",
-									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive",
-									"name": "Connection",
-									"description": "Options that are desired for the connection"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=UTF-8",
-									"name": "Content-Type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
-									"name": "Date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "Server",
-									"value": "nginx",
-									"name": "Server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "Transfer-Encoding",
-									"value": "chunked",
-									"name": "Transfer-Encoding",
-									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "PHP/7.1.12",
-									"name": "X-Powered-By",
-									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
-								}
-							],
-							"cookie": [
-								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
-									"httpOnly": false,
-									"domain": "localhost",
-									"path": "/",
-									"secure": false,
-									"value": "6c666219a19900a95cc3905aecfaacd0",
-									"key": "PHPSESSID"
-								}
-							],
-							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
-						}
-					]
-				},
-				{
-					"name": "Internal procedure",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {},
-						"url": {
-							"raw": "http://{{host}}/v1/access_level_example/access_internal",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"v1",
-								"access_level_example",
-								"access_internal"
-							]
-						},
-						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
-					},
-					"response": [
-						{
-							"name": "Auth",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
-									},
-									{
-										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
-									}
-								],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "test_boolean",
-											"value": "true",
-											"type": "text"
-										},
-										{
-											"key": "test_domain",
-											"value": "domain.com",
-											"type": "text"
-										},
-										{
-											"key": "test_email",
-											"value": "test@domain.com",
-											"type": "text"
-										},
-										{
-											"key": "test_float",
-											"value": "1.7",
-											"type": "text"
-										},
-										{
-											"key": "test_int",
-											"value": "7",
-											"type": "text"
-										},
-										{
-											"key": "test_int_not_check",
-											"value": "89",
-											"type": "text"
-										},
-										{
-											"key": "test_ip",
-											"value": "127.0.0.1",
-											"type": "text"
-										},
-										{
-											"key": "test_mac",
-											"value": "00-15-5D-D7-34-2B",
-											"type": "text"
-										},
-										{
-											"key": "test_url",
-											"value": "http://www.example.com/?test=test_value",
-											"type": "text"
-										}
-									]
-								},
-								"url": {
-									"raw": "http://{{host}}/v1/helloworld/example_auth",
-									"protocol": "http",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"v1",
-										"helloworld",
-										"example_auth"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Access-Control-Allow-Headers",
-									"value": "*",
-									"name": "Access-Control-Allow-Headers",
-									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-								},
-								{
-									"key": "Access-Control-Allow-Methods",
-									"value": "*",
-									"name": "Access-Control-Allow-Methods",
-									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*",
-									"name": "Access-Control-Allow-Origin",
-									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive",
-									"name": "Connection",
-									"description": "Options that are desired for the connection"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=UTF-8",
-									"name": "Content-Type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
-									"name": "Date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "Server",
-									"value": "nginx",
-									"name": "Server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "Transfer-Encoding",
-									"value": "chunked",
-									"name": "Transfer-Encoding",
-									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "PHP/7.1.12",
-									"name": "X-Powered-By",
-									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
-								}
-							],
-							"cookie": [
-								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
-									"httpOnly": false,
-									"domain": "localhost",
-									"path": "/",
-									"secure": false,
-									"value": "6c666219a19900a95cc3905aecfaacd0",
-									"key": "PHPSESSID"
-								}
-							],
-							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
-						}
-					]
-				},
-				{
-					"name": "Call Internal",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {},
-						"url": {
-							"raw": "http://{{host}}/v1/access_level_example2/call_internal",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"v1",
-								"access_level_example2",
+								"03_2_access_level_example",
 								"call_internal"
 							]
 						},
@@ -2482,13 +2253,11 @@
 								"header": [
 									{
 										"key": "auth-id",
-										"value": "id_user_tmp_23",
-										"disabled": false
+										"value": "id_user_tmp_23"
 									},
 									{
 										"key": "x-auth-token",
-										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF",
-										"disabled": false
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
 									}
 								],
 								"body": {
@@ -2615,7 +2384,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -2627,14 +2396,9 @@
 							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
 						}
 					]
-				}
-			]
-		},
-		{
-			"name": "4. Dynamic database example",
-			"item": [
+				},
 				{
-					"name": "Call db2",
+					"name": "Access private via external module",
 					"event": [
 						{
 							"listen": "test",
@@ -2663,15 +2427,215 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "{{host}}/v1/dynamic_db_example/call_db2",
+							"raw": "http://{{host}}/v1/03_2_access_level_example/call_private",
+							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"dynamic_db_example",
+								"03_2_access_level_example",
+								"call_private"
+							]
+						},
+						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
+					},
+					"response": [
+						{
+							"name": "Auth",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "auth-id",
+										"value": "id_user_tmp_23"
+									},
+									{
+										"key": "x-auth-token",
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "test_boolean",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "test_domain",
+											"value": "domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_email",
+											"value": "test@domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_float",
+											"value": "1.7",
+											"type": "text"
+										},
+										{
+											"key": "test_int",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "test_int_not_check",
+											"value": "89",
+											"type": "text"
+										},
+										{
+											"key": "test_ip",
+											"value": "127.0.0.1",
+											"type": "text"
+										},
+										{
+											"key": "test_mac",
+											"value": "00-15-5D-D7-34-2B",
+											"type": "text"
+										},
+										{
+											"key": "test_url",
+											"value": "http://www.example.com/?test=test_value",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{host}}/v1/helloworld/example_auth",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"helloworld",
+										"example_auth"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*",
+									"name": "Access-Control-Allow-Headers",
+									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "*",
+									"name": "Access-Control-Allow-Methods",
+									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"name": "Access-Control-Allow-Origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8",
+									"name": "Content-Type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "Server",
+									"value": "nginx",
+									"name": "Server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.1.12",
+									"name": "X-Powered-By",
+									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "localhost",
+									"path": "/",
+									"secure": false,
+									"value": "6c666219a19900a95cc3905aecfaacd0",
+									"key": "PHPSESSID"
+								}
+							],
+							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "04. Dynamic database example",
+			"item": [
+				{
+					"name": "Access database db2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/v1/04_dynamic_db_example/call_db2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"04_dynamic_db_example",
 								"call_db2"
 							]
 						},
@@ -2683,7 +2647,6 @@
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
-								"body": {},
 								"url": {
 									"raw": "http://{{host}}/v1/helloworld/basic",
 									"protocol": "http",
@@ -2758,7 +2721,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -2801,15 +2764,14 @@
 						},
 						"method": "POST",
 						"header": [],
-						"body": {},
 						"url": {
-							"raw": "{{host}}/v1/dynamic_db_example/info",
+							"raw": "{{host}}/v1/04_dynamic_db_example/info",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"v1",
-								"dynamic_db_example",
+								"04_dynamic_db_example",
 								"info"
 							]
 						},
@@ -2821,7 +2783,6 @@
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
-								"body": {},
 								"url": {
 									"raw": "http://{{host}}/v1/helloworld/basic",
 									"protocol": "http",
@@ -2896,7 +2857,7 @@
 							],
 							"cookie": [
 								{
-									"expires": "Tue Jan 19 2038 12:14:07 GMT+0900 (대한민국 표준시)",
+									"expires": "Invalid Date",
 									"httpOnly": false,
 									"domain": "localhost",
 									"path": "/",
@@ -2906,6 +2867,225 @@
 								}
 							],
 							"body": "{\"success\":true,\"msg\":\"Hello world!! (POST method)\",\"data\":[\"POST \\ubc29\\uc2dd\\uc73c\\ub85c \\uc811\\uadfc\\ud558\\uc600\\uc2b5\\ub2c8\\ub2e4.\"]}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "05. Broker",
+			"item": [
+				{
+					"name": "Select",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fdc29fc3-ac00-4a6f-8864-6711f3823d85",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3b9436ce-172f-4f85-a3be-fe8d27396c22",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "start",
+									"value": "0",
+									"description": ":",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "rows",
+									"value": "20",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}/v1/05_broker/select",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"05_broker",
+								"select"
+							]
+						},
+						"description": "# method.auth.php\n- 인증 정보를 받아 사용자 인증을 수행가능함\n- method.php 보다 먼저 호출되어서 사용자 인증을 수행 할 수 있다."
+					},
+					"response": [
+						{
+							"name": "Auth",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "auth-id",
+										"value": "id_user_tmp_23"
+									},
+									{
+										"key": "x-auth-token",
+										"value": "fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "test_boolean",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "test_domain",
+											"value": "domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_email",
+											"value": "test@domain.com",
+											"type": "text"
+										},
+										{
+											"key": "test_float",
+											"value": "1.7",
+											"type": "text"
+										},
+										{
+											"key": "test_int",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "test_int_not_check",
+											"value": "89",
+											"type": "text"
+										},
+										{
+											"key": "test_ip",
+											"value": "127.0.0.1",
+											"type": "text"
+										},
+										{
+											"key": "test_mac",
+											"value": "00-15-5D-D7-34-2B",
+											"type": "text"
+										},
+										{
+											"key": "test_url",
+											"value": "http://www.example.com/?test=test_value",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{host}}/v1/helloworld/example_auth",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"helloworld",
+										"example_auth"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*",
+									"name": "Access-Control-Allow-Headers",
+									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "*",
+									"name": "Access-Control-Allow-Methods",
+									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"name": "Access-Control-Allow-Origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8",
+									"name": "Content-Type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 22 Jun 2018 02:51:35 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "Server",
+									"value": "nginx",
+									"name": "Server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.1.12",
+									"name": "X-Powered-By",
+									"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "localhost",
+									"path": "/",
+									"secure": false,
+									"value": "6c666219a19900a95cc3905aecfaacd0",
+									"key": "PHPSESSID"
+								}
+							],
+							"body": "{\"success\":true,\"msg\":\"Hello world!! (auth example)\",\"data\":[\"x-auth-id : \",\"x-auth-token : fjkds.fds4bnv03FE2hudfj0231h.104231hfwqDF\",\"post.auth.php \\ud30c\\uc77c\\uc5d0\\uc11c id\\ub610\\ub294 \\ud1a0\\ud070\\uc73c\\ub85c \\uc0ac\\uc6a9\\uc790 \\uc778\\uc99d\\uc744 \\uc218\\ud589\\uac00\\ub2a5\\ud568\"]}"
 						}
 					]
 				}
@@ -2936,9 +3116,9 @@
 	],
 	"variable": [
 		{
-			"id": "4c7ba1cc-1369-48e3-986d-fe13e96ea9a7",
+			"id": "b5b1a8ea-7d3b-47e7-86ac-5a010a54e2f0",
 			"key": "host",
-			"value": "192.168.99.100",
+			"value": "localhost",
 			"type": "string"
 		}
 	]
