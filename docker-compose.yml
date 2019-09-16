@@ -33,7 +33,7 @@ services:
   ports:
    - 4306:3306
   volumes:
-   - ./db2.sql:/docker-entrypoint-initdb.d/dump.sql
+   - \\work/RESTer/rester-sql/sql/db2.sql:/docker-entrypoint-initdb.d/dump.sql
   environment:
    MYSQL_RANDOM_ROOT_PASSWORD: "true"
    MYSQL_DATABASE: "rester-sql2"
