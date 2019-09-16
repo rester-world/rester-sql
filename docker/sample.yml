@@ -1,0 +1,75 @@
+version: '2'
+
+services:
+
+# cache redis server
+ redis:
+  container_name: redis
+  image: redis
+  restart: always
+  ports:
+  - 6379:6379
+
+# sample database
+ db:
+  container_name: db
+  image: mariadb
+  restart: always
+  ports:
+    - 3306:3306
+  volumes:
+    - ./db.sql:/docker-entrypoint-initdb.d/dump.sql
+  environment:
+   MYSQL_RANDOM_ROOT_PASSWORD: "true"
+   MYSQL_DATABASE: "rester-sql"
+   MYSQL_USER: "rester-sql"
+   MYSQL_PASSWORD: "rester-sql"
+
+# second database
+ db2:
+  container_name: db2
+  image: mariadb
+  restart: always
+  ports:
+   - 4306:3306
+  volumes:
+   - ./db2.sql:/docker-entrypoint-initdb.d/dump.sql
+  environment:
+   MYSQL_RANDOM_ROOT_PASSWORD: "true"
+   MYSQL_DATABASE: "rester-sql2"
+   MYSQL_USER: "rester-sql2"
+   MYSQL_PASSWORD: "rester-sql2"
+
+ rester-sql:
+  container_name: rester-sql
+  image: rester/rester-docker
+  restart: always
+  links:
+    - redis:cache.rester.kr
+    - db:db.rester.kr
+    - db2:db2.rester.kr
+  volumes:
+   - ./nginx-conf:/etc/nginx/sites-available:ro
+   - ./cfg:/var/www/cfg:ro
+   - ./rester-core:/var/www/rester-core
+   - ./rester-sql:/var/www/rester-sql
+   - ./src:/var/www/src
+  ports:
+  - '80:80'
+  -
+ rester-sql-broker:
+  container_name: rester-sql-broker
+  image: rester/rester-docker
+  restart: always
+  links:
+   - redis:cache.rester.kr
+   - db:db.rester.kr
+   - db2:db2.rester.kr
+  volumes:
+   - ./nginx-conf:/etc/nginx/sites-available:ro
+   - ./cfg:/var/www/cfg:ro
+   - ./rester-core:/var/www/rester-core
+   - ./rester-sql:/var/www/rester-sql
+   - ./src:/var/www/src
+  ports:
+   - '80:80'
