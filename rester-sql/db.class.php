@@ -17,6 +17,7 @@ class db
      * 데이터베이스 정보를 동적으로 받아올 때
      * 호스팅 서비스등
      */
+    const type_db_broker         = 'broker';
     const type_db_dynamic        = 'dynamic';
     const type_db_dynamic_module = 'module';
     const type_db_dynamic_proc   = 'proc';

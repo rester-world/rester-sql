@@ -55,7 +55,7 @@ class resterSQL extends rester
         // 프로시저 파일 체크
         if(!$this->path_proc_sql && !$path_proc)
         {
-            throw new Exception("Not found procedure. Module: {$module}, Procedure: {$proc} ", rester_response::code_not_found);
+            throw new Exception("Not found procedure. Module({$module}), Procedure({$proc}) ", rester_response::code_not_found);
         }
         return $path_proc;
     }
@@ -103,7 +103,10 @@ class resterSQL extends rester
         $this->check_access_level($caller);
 
         // check auth
-        if($this->check_auth) { session::get(cfg::token()); }
+        if($this->check_auth) {
+            $session = session::get_token(cfg::token());
+            if(!$session) throw new Exception("Login required!", rester_response::code_login_fail);
+        }
 
         $response_data = false;
 
@@ -116,11 +119,21 @@ class resterSQL extends rester
         // include procedure
         if(!$response_data)
         {
-            if($this->path_proc_sql)
+            // check broker
+            $db_cfg = cfg::database($this->cfg->database());
+            if(($db_cfg[db::cfk_type] == db::type_db_broker) && $this->path_proc_sql)
+            {
+                $param = $this->request_param(null);
+                $query = file_get_contents($this->path_proc_sql);
+                $response_data = response_data(exten_post($db_cfg['request'], $db_cfg['module'],$db_cfg['proc'], ['query'=>$query, 'params'=>$param]),false);
+            }
+            // execute sql file
+            else if($this->path_proc_sql)
             {
                 $response_data = $this->execute_sql($this->path_proc_sql);
             }
-            elseif($this->path_proc)
+            // execute php file
+            else if($this->path_proc)
             {
                 $response_data = include $this->path_proc;
             }
@@ -128,7 +141,7 @@ class resterSQL extends rester
             // cached body
             if($this->cache_timeout)
             {
-                $this->redis->set($this->cache_key,json_encode($response_data),$this->cache_timeout);
+                $this->redis->set($this->cache_key,json_encode($response_data, JSON_UNESCAPED_UNICODE),$this->cache_timeout);
             }
         }
         return $response_data;

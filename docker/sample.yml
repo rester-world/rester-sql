@@ -56,4 +56,20 @@ services:
    - ./src:/var/www/src
   ports:
   - '80:80'
-  - '443:443'
+  -
+ rester-sql-broker:
+  container_name: rester-sql-broker
+  image: rester/rester-docker
+  restart: always
+  links:
+   - redis:cache.rester.kr
+   - db:db.rester.kr
+   - db2:db2.rester.kr
+  volumes:
+   - ./nginx-conf:/etc/nginx/sites-available:ro
+   - ./cfg:/var/www/cfg:ro
+   - ./rester-core:/var/www/rester-core
+   - ./rester-sql:/var/www/rester-sql
+   - ./src:/var/www/src
+  ports:
+   - '80:80'
