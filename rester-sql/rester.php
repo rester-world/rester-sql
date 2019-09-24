@@ -72,7 +72,7 @@ function query_database($name, $queries, $request_params)
 function fetch_database($name, $queries, $request_params)
 {
     $response_data = query_database($name, $queries, $request_params);
-    if(is_array($response_data) && sizeof($response_data)==1) $response_data = $response_data[0];
+    if(is_array($response_data)) $response_data = $response_data[0];
     return $response_data;
 }
 
