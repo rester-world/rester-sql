@@ -91,6 +91,9 @@ function request_module($module, $proc, $query=[])
 
     try
     {
+        if($token = request_param('token')) $query['token'] = $token;
+        if($secret = request_param('secret')) $query['secret'] = $secret;
+
         $current_rester = new resterSQL($module, $proc, $query);
         $res = $current_rester->run($old_rester);
     }
@@ -117,6 +120,9 @@ function request_procedure($proc, $query=[])
 
     try
     {
+        if($token = request_param('token')) $query['token'] = $token;
+        if($secret = request_param('secret')) $query['secret'] = $secret;
+
         $current_rester = new resterSQL($current_rester->module(), $proc, $query);
         $res = $current_rester->run($old_rester);
     }
