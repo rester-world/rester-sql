@@ -11,6 +11,14 @@ require_once dirname(__FILE__) . '/../rester-core/common.php';
 require_once dirname(__FILE__) . '/db.class.php';
 require_once dirname(__FILE__) . '/resterSQL.class.php';
 
+// -----------------------------------------------------------------------------
+/// include aws
+// -----------------------------------------------------------------------------
+$path_aws = dirname(__FILE__) . '/../exten_lib/aws/vendor/autoload.php';
+if(is_file($path_aws)) {
+    require_once $path_aws;
+}
+
 /**
  * @param string $name
  * @param string $queries
